@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Amour — Menü</title>
+  <meta name="description" content="Amour Café — Yalova. Siyah-beyaz minimalist menü ve sepet.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Parisienne&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter','ui-sans-serif','system-ui','sans-serif'],
+            script: ['Parisienne','cursive']
+          },
+          colors: { bg: '#0b0b0b' }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background:#0b0b0b; color:#fff; }
+    .card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; }
+    .img { aspect-ratio: 4/3; object-fit: cover; width: 100%; filter: grayscale(100%) contrast(105%); }
+    .divider { border-top: 1px dashed rgba(255,255,255,.1); }
+    .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,.25); border-radius: 9999px; }
+  </style>
+</head>
+<body class="font-sans">
+  <div id="root"></div>
+  <script>
+      const CATS = {
+        hot:{ key:"hot", title:"SICAK İÇECEKLER" },
+        herbal:{ key:"herbal", title:"BİTKİ ÇAYLARI" },
+        cocktails:{ key:"cocktails", title:"KOKTEYLLER" },
+        cold:{ key:"cold", title:"SOĞUK İÇECEKLER" },
+        icecream:{ key:"icecream", title:"DONDURMALAR" },
+        coffees:{ key:"coffees", title:"KAHVELER" },
+        filter:{ key:"filter", title:"FİLTRE KAHVELER" },
+        iced:{ key:"iced", title:"SOĞUK KAHVELER" },
+        extras:{ key:"extras", title:"EKSTRALAR" },
+        desserts:{ key:"desserts", title:"TATLILAR" },
+      };
+
+      // Полное меню (по ранее присланному списку), изображения из /images/<id>.jpg
+      const MENU = [
+        { id:"cay", cat:"hot", name:"Çay", price:50, img:"images/cay.jpg" },
+        { id:"fincan-cay", cat:"hot", name:"Fincan Çay", price:80, img:"images/fincan-cay.jpg" },
+        { id:"takeaway-cay", cat:"hot", name:"Take a way Çay", price:80, img:"images/takeaway-cay.jpg" },
+        { id:"salep", cat:"hot", name:"Salep", price:180, img:"images/salep.jpg" },
+        { id:"sicak-cikolata", cat:"hot", name:"Sıcak Çikolata", price:180, img:"images/sicak-cikolata.jpg" },
+        { id:"beyaz-sicak-cikolata", cat:"hot", name:"Beyaz Sıcak Çikolata", price:180, img:"images/beyaz-sicak-cikolata.jpg" },
+        { id:"chai-latte", cat:"hot", name:"Chai Tea Latte", price:180, img:"images/chai-latte.jpg" },
+        { id:"balli-sut", cat:"hot", name:"Ballı Süt", price:150, img:"images/balli-sut.jpg" },
+
+        ...["Ihlamur","Kış Çayı","Yeşil Çay","Ada Çayı","Papatya","Kuşburnu Çayı"].map((n,i)=>({ id:`herbal-${i}`, cat:"herbal", name:n, price:190, img:`images/herbal-${i}.jpg` })),
+
+        { id:"amour-milano", cat:"cocktails", name:"Amour Milano", price:230, img:"images/amour-milano.jpg" },
+        { id:"amour-special", cat:"cocktails", name:"Amour Special", price:230, img:"images/amour-special.jpg" },
+        { id:"amour-velo", cat:"cocktails", name:"Amour Velo", price:230, img:"images/amour-velo.jpg" },
+        { id:"amour-mild-berry", cat:"cocktails", name:"Amour Mild Berry", price:230, img:"images/amour-mild-berry.jpg" },
+        { id:"amour-vibe", cat:"cocktails", name:"Amour Vibe", price:230, img:"images/amour-vibe.jpg" },
+        { id:"amour-sky", cat:"cocktails", name:"Amour Sky", price:230, img:"images/amour-sky.jpg" },
+        { id:"amour-lime", cat:"cocktails", name:"Amour Lime", price:180, img:"images/amour-lime.jpg" },
+        { id:"amour-mango-portakal", cat:"cocktails", name:"Amour Mango Portakal (Sıfır Şeker)", price:180, img:"images/amour-mango-portakal.jpg" },
+        { id:"amour-lime-zero", cat:"cocktails", name:"Amour Lime (Sıfır Şeker)", price:180, img:"images/amour-lime-zero.jpg" },
+        { id:"amour-hibiscus", cat:"cocktails", name:"Amour Hibiscus (Sıfır Şeker)", price:180, img:"images/amour-hibiscus.jpg" },
+
+        { id:"su", cat:"cold", name:"Su", price:50, img:"images/su.jpg" },
+        { id:"milkshake", cat:"cold", name:"Milkshake (çikolata, çilek, muz, vanilya, oreo)", price:190, img:"images/milkshake.jpg" },
+        { id:"frozen", cat:"cold", name:"Frozen (mango, çilek, şeftali, yaban mersini, frambuaz, orman meyveli)", price:190, img:"images/frozen.jpg" },
+        { id:"italian-soda", cat:"cold", name:"İtalian Soda (nar, çilek, mango, böğürtlen)", price:190, img:"images/italian-soda.jpg" },
+        { id:"limonata", cat:"cold", name:"Limonata", price:180, img:"images/limonata.jpg" },
+        { id:"aromali-limonata", cat:"cold", name:"Aromalı Limonata (çilek, nar, nane)", price:180, img:"images/aromali-limonata.jpg" },
+        { id:"churchill", cat:"cold", name:"Churchill", price:100, img:"images/churchill.jpg" },
+        { id:"sikma-portakal", cat:"cold", name:"Sıkma Portakal Suyu", price:180, img:"images/sikma-portakal.jpg" },
+        { id:"enerji-icecek", cat:"cold", name:"Enerji İçeceği", price:170, img:"images/enerji-icecek.jpg" },
+        { id:"mesrubatlar", cat:"cold", name:"Meşrubatlar (cola turka, uludağ portakal, uludağ gazoz, ice tea)", price:120, img:"images/mesrubatlar.jpg" },
+        { id:"soda", cat:"cold", name:"Soda", price:100, img:"images/soda.jpg" },
+        { id:"meyveli-soda", cat:"cold", name:"Meyveli Soda (limon, elma, nar, karpuz çilek)", price:100, img:"images/meyveli-soda.jpg" },
+
+        { id:"espresso", cat:"coffees", name:"Espresso", sizes:{S:120, M:140}, img:"images/espresso.jpg" },
+        { id:"espresso-macchiato", cat:"coffees", name:"Espresso Macchiato", sizes:{S:140, M:160}, img:"images/espresso-macchiato.jpg" },
+        { id:"americano", cat:"coffees", name:"Coffee Americano", sizes:{S:170, M:190}, img:"images/americano.jpg" },
+        { id:"latte", cat:"coffees", name:"Coffee Latte", sizes:{S:180, M:195}, img:"images/latte.jpg" },
+        { id:"white-mocha", cat:"coffees", name:"White Mocha", sizes:{S:185, M:195}, img:"images/white-mocha.jpg" },
+        { id:"mocha", cat:"coffees", name:"Mocha", sizes:{S:185, M:195}, img:"images/mocha.jpg" },
+        { id:"caramel-latte", cat:"coffees", name:"Caramel Latte", sizes:{S:185, M:195}, img:"images/caramel-latte.jpg" },
+        { id:"cappuccino", cat:"coffees", name:"Cappuccino", sizes:{S:180, M:195}, img:"images/cappuccino.jpg" },
+        { id:"cortado", cat:"coffees", name:"Cortado", sizes:{S:180, M:190}, img:"images/cortado.jpg" },
+        { id:"flat-white", cat:"coffees", name:"Flat White", sizes:{S:180, M:190}, img:"images/flat-white.jpg" },
+        { id:"latte-macchiato", cat:"coffees", name:"Latte Macchiato", sizes:{S:180, M:195}, img:"images/latte-macchiato.jpg" },
+        { id:"nutellatte", cat:"coffees", name:"Nutellatte", sizes:{S:200, M:210}, img:"images/nutellatte.jpg" },
+        { id:"deca-cream", cat:"coffees", name:"Deca Cream (Espresso)", price:200, img:"images/deca-cream.jpg" },
+        { id:"turk-kahvesi", cat:"coffees", name:"Türk Kahvesi", price:170, img:"images/turk-kahvesi.jpg" },
+        { id:"double-turk", cat:"coffees", name:"Duble Türk Kahvesi", price:190, img:"images/double-turk.jpg" },
+        { id:"dibek", cat:"coffees", name:"Dibek Kahvesi", price:170, img:"images/dibek.jpg" },
+        { id:"menengic", cat:"coffees", name:"Menengiç Kahvesi", price:180, img:"images/menengic.jpg" },
+
+        { id:"kenya", cat:"filter", name:"Kenya AA", price:160, img:"images/kenya.jpg" },
+        { id:"colombia", cat:"filter", name:"Colombia", price:160, img:"images/colombia.jpg" },
+        { id:"ethiopia", cat:"filter", name:"Ethiopia", price:160, img:"images/ethiopia.jpg" },
+        { id:"costarica", cat:"filter", name:"Costarica", price:160, img:"images/costarica.jpg" },
+        { id:"guatemala", cat:"filter", name:"Guatemala", price:160, img:"images/guatemala.jpg" },
+        { id:"v60", cat:"filter", name:"V60", price:180, img:"images/v60.jpg" },
+        { id:"chemex", cat:"filter", name:"Chemex", price:180, img:"images/chemex.jpg" },
+
+        { id:"iced-americano", cat:"iced", name:"Iced Americano", price:180, img:"images/iced-americano.jpg" },
+        { id:"iced-latte", cat:"iced", name:"Iced Latte", price:185, img:"images/iced-latte.jpg" },
+        { id:"iced-mocha", cat:"iced", name:"Iced Mocha", price:190, img:"images/iced-mocha.jpg" },
+        { id:"iced-caramel-latte", cat:"iced", name:"Iced Caramel Latte", price:190, img:"images/iced-caramel-latte.jpg" },
+        { id:"iced-white-mocha", cat:"iced", name:"Iced White Mocha", price:190, img:"images/iced-white-mocha.jpg" },
+        { id:"cold-brew", cat:"iced", name:"Cold Brew", price:190, img:"images/cold-brew.jpg" },
+        { id:"frappe", cat:"iced", name:"Frappe (çikolata, karamel, vanilya, çilek)", price:190, img:"images/frappe.jpg" },
+        { id:"italian-frappe", cat:"iced", name:"Italian Frappe", price:190, img:"images/italian-frappe.jpg" },
+        { id:"greek-frappe", cat:"iced", name:"Greek Frappe", price:190, img:"images/greek-frappe.jpg" },
+        { id:"ice-nutellatte", cat:"iced", name:"Ice Nutellatte", price:200, img:"images/ice-nutellatte.jpg" },
+        { id:"ice-chai-latte", cat:"iced", name:"Ice Chai Tea Latte", price:190, img:"images/ice-chai-latte.jpg" },
+        { id:"affogato", cat:"iced", name:"Affogato", price:200, img:"images/affogato.jpg" },
+
+        { id:"extra-shot", cat:"extras", name:"Ekstra Shot (espresso)", price:50, img:"images/extra-shot.jpg" },
+        { id:"extra-syrup", cat:"extras", name:"Ekstra Şurup", price:30, img:"images/extra-syrup.jpg" },
+        { id:"extra-milk", cat:"extras", name:"Ekstra Süt", price:30, img:"images/extra-milk.jpg" },
+        { id:"extra-honey", cat:"extras", name:"Ekstra Bal", price:30, img:"images/extra-honey.jpg" },
+        { id:"powerbank", cat:"extras", name:"Powerbank (30 dakika)", price:30, img:"images/powerbank.jpg" },
+
+        { id:"magnolia", cat:"desserts", name:"Magnolia", price:200, img:"images/magnolia.jpg" },
+        { id:"profiterol", cat:"desserts", name:"Profiterol", price:250, img:"images/profiterol.jpg" },
+        { id:"san-sebastian", cat:"desserts", name:"San Sebastian", price:250, img:"images/san-sebastian.jpg" },
+        { id:"brownie", cat:"desserts", name:"Brownie", price:200, img:"images/brownie.jpg" },
+        { id:"lotus-cup", cat:"desserts", name:"Lotus Cup", price:200, img:"images/lotus-cup.jpg" },
+        { id:"oreo-cup", cat:"desserts", name:"Oreo Cup", price:250, img:"images/oreo-cup.jpg" },
+        { id:"trilece", cat:"desserts", name:"Trileçe", price:200, img:"images/trilece.jpg" },
+        { id:"lotus-cheesecake", cat:"desserts", name:"Lotus Cheesecake", price:220, img:"images/lotus-cheesecake.jpg" },
+        { id:"mini-cookies", cat:"desserts", name:"Atıştırmalık Kurabiye Çeşitleri", price:70, img:"images/mini-cookies.jpg" },
+      ];
+const fmt = n => new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY',maximumFractionDigits:0}).format(n);
+const root = document.getElementById('root');
+
+function h(tag, props={}, ...children){
+  const el = document.createElement(tag);
+  Object.entries(props||{}).forEach(([k,v])=>{
+    if (k==='class') el.className=v;
+    else if (k==='src') el.src=v;
+    else if (k==='href') el.href=v;
+    else if (k.startsWith('on') && typeof v==='function') el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (v!=null) el.setAttribute(k,v);
+  });
+  children.flat().forEach(c => el.appendChild(typeof c==='string' ? document.createTextNode(c) : c));
+  return el;
+}
+
+let active='hot', cart=[];
+
+function setActive(k){ active=k; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function addItem(item){
+  const found = cart.find(x=>x.id===item.id);
+  if (found) found.qty++;
+  else cart.push({ ...item, qty:1 });
+  updateCartBar();
+}
+
+function changeQty(id, d){
+  cart = cart.map(x=> x.id===id ? { ...x, qty: Math.max(0, x.qty+d)} : x).filter(x=>x.qty>0);
+  updateCartBar();
+}
+
+function clearCart(){ cart=[]; updateCartBar(); }
+
+function updateCartBar(){
+  const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const count = cart.reduce((s,i)=>s+i.qty,0);
+  const bar = document.querySelector('.cart-bar');
+  if (bar){
+    const countEl = bar.querySelector('.cart-count');
+    const totalEl = bar.querySelector('.cart-total');
+    if (countEl) countEl.textContent = `🧺 Ürün: ${count}`;
+    if (totalEl) totalEl.textContent = `Toplam: ${fmt(total)}`;
+  }
+}
+
+function render(){
+  root.innerHTML = '';
+
+  // Header
+  const header = h('div', { class:'sticky top-0 z-30 bg-black border-b border-white/10 shadow-sm' },
+    h('div', { class:'max-w-6xl mx-auto h-24 px-6 flex items-center justify-between' },
+      h('img', { src:'images/logo-segafredo.png', class:'h-12 w-auto opacity-90 hover:opacity-100 transition' }),
+      h('div', { class:'flex-1 flex justify-center' },
+        h('img', { src:'images/logo.png', class:'h-20 md:h-24 w-auto mx-auto' })
+      ),
+      h('img', { src:'images/logo-alpedo.png', class:'h-14 w-auto opacity-90 hover:opacity-100 transition' })
+    )
+  );
+
+  // Sidebar + Menu
+  const layout = h('div', { class:'max-w-6xl mx-auto grid grid-cols-12 gap-4 px-4 pt-4 pb-24' });
+  const aside = h('aside', { class:'hidden md:block col-span-3' },
+    h('div', { class:'sticky top-36 space-y-1' },
+      ...Object.values(CATS).map(c =>
+        h('button', {
+          class:'w-full text-left px-3 py-2 rounded-lg border ' + 
+          (active===c.key ? 'bg-white text-black' : 'bg-transparent text-white hover:bg-white/10') + 
+          ' border-white/10',
+          onclick:()=>setActive(c.key)
+        }, c.title)
+      )
+    )
+  );
+
+  const listWrap = h('div', { class:'col-span-12 md:col-span-9' },
+    h('div', { class:'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' },
+      ...MENU.filter(m=>m.cat===active).map(item =>
+        h('article', { class:'card overflow-hidden' },
+          h('img', { class:'img', src:item.img, alt:item.name }),
+          h('div', { class:'p-3' },
+            h('div', { class:'flex items-start justify-between gap-3' },
+              h('h3', { class:'font-medium' }, item.name),
+              h('div', { class:'text-sm font-semibold' }, fmt(item.price))
+            ),
+            h('button', { 
+              class:'w-full mt-3 px-3 py-2 rounded-lg bg-white text-black', 
+              onclick:()=>addItem(item) 
+            }, 'Ekle')
+          )
+        )
+      )
+    )
+  );
+
+  layout.appendChild(aside);
+  layout.appendChild(listWrap);
+
+  const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const count = cart.reduce((s,i)=>s+i.qty,0);
+
+  const bottom = h('div', { 
+    class:'cart-bar fixed bottom-0 left-0 right-0 border-t border-white/10 bg-black/90 backdrop-blur flex items-center justify-between px-6 py-2 text-sm text-white/80'
+  },
+    h('div', { class:'cart-count' }, `🧺 Ürün: ${count}`),
+    h('div', { class:'cart-total' }, `Toplam: ${fmt(total)}`),
+    h('button', { 
+      class:'px-4 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition text-white text-xs',
+      onclick:()=>openCart()
+    }, 'Sepeti Aç')
+  );
+
+  root.appendChild(header);
+  root.appendChild(layout);
+  root.appendChild(bottom);
+}
+//ФУНКЦИЯ ОПЕН КАРТА --------------------------------------------------------------------------
+
+function openCart(){
+  document.querySelectorAll('.cart-overlay').forEach(o => o.remove());
+
+  const overlay = document.createElement('div');
+  overlay.className = 'cart-overlay fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300';
+  document.body.appendChild(overlay);
+  setTimeout(()=>overlay.classList.add('opacity-100'), 10);
+
+  const panel = document.createElement('div');
+  panel.className = 'h-full w-full max-w-md bg-zinc-950 text-white flex flex-col translate-x-full transition-transform duration-300 ease-out shadow-[0_0_40px_rgba(0,0,0,0.6)]';
+  overlay.appendChild(panel);
+  setTimeout(()=>panel.classList.remove('translate-x-full'), 20);
+
+  function closeCart(){
+    panel.classList.add('translate-x-full');
+    overlay.classList.remove('opacity-100');
+    setTimeout(()=>overlay.remove(), 300);
+  }
+
+  const header = h('div', { class:'p-4 flex items-center justify-between border-b border-white/10 bg-white/5 backdrop-blur-sm' },
+    h('div', { class:'font-semibold text-lg flex items-center gap-2' }, '🧺', 'Sepet'),
+    h('button', { 
+      class:'px-3 py-1 rounded-lg border border-white/15 hover:bg-white/10 transition', 
+      onclick: closeCart 
+    }, '✕')
+  );
+
+  const list = h('div', { class:'p-4 flex-1 overflow-y-auto scrollbar-thin space-y-4' });
+  let footerTotal;
+
+  function refreshList(){
+    list.innerHTML = '';
+    const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+
+    if (!cart.length){
+      list.appendChild(h('div', { class:'text-sm opacity-70 text-center mt-6' }, 'Sepet boş'));
+    } else {
+      cart.forEach(i => {
+        // Попробуем найти товар из MENU по полному совпадению id
+        const menuItem = MENU.find(m => m.id === i.id) || MENU.find(m => i.id.startsWith(m.id));
+        const imgSrc = menuItem?.img || 'images/default.jpg';
+
+        list.appendChild(
+          h('div', { class:'bg-white text-black rounded-xl p-3 flex items-center justify-between gap-3 shadow-sm hover:shadow-md transition-all duration-150 ease-in' },
+            h('img', { src: imgSrc, alt: i.name, class:'w-12 h-12 rounded-md object-cover border border-zinc-200' }),
+            h('div', { class:'flex-1 pr-2' },
+              h('div', { class:'font-semibold text-sm leading-tight' }, i.name),
+              h('div', { class:'text-xs text-zinc-600 mt-1' }, `${fmt(i.price)} × ${i.qty}`)
+            ),
+            h('div', { class:'flex items-center gap-1' },
+              h('button', { 
+                class:'w-7 h-7 rounded-lg border border-zinc-300 text-sm hover:bg-zinc-200', 
+                onclick:()=>{ changeQty(i.id,-1); refreshList(); } 
+              }, '−'),
+              h('div', { class:'w-6 text-center text-sm font-semibold' }, i.qty),
+              h('button', { 
+                class:'w-7 h-7 rounded-lg border border-zinc-300 text-sm hover:bg-zinc-200', 
+                onclick:()=>{ changeQty(i.id,1); refreshList(); } 
+              }, '+'),
+              h('button', { 
+                class:'w-7 h-7 ml-2 rounded-lg border border-red-400 text-red-500 text-sm hover:bg-red-100', 
+                title:'Sil', 
+                onclick:()=>{ cart = cart.filter(x=>x.id!==i.id); refreshList(); } 
+              }, '🗑️')
+            )
+          )
+        );
+      });
+    }
+
+    if (footerTotal) footerTotal.textContent = fmt(total);
+  }
+
+  const footer = h('div', { class:'p-4 border-t border-white/10 bg-white/5 backdrop-blur-sm space-y-3' },
+    h('div', { class:'flex items-center justify-between text-white' }, 
+      h('div', { class:'font-medium text-sm' }, 'Toplam'), 
+      (footerTotal = h('div', { class:'font-semibold text-base' }, fmt(cart.reduce((s,i)=>s+i.price*i.qty,0))))
+    ),
+    h('div', { class:'flex gap-2' },
+      h('button', { 
+        class:'flex-1 px-4 py-3 rounded-xl bg-white text-black font-semibold hover:bg-white/90 transition', 
+        onclick: ()=>{ alert('Siparişiniz garsona bildirilecektir.'); closeCart(); } 
+      }, 'Tamam'),
+      h('button', { 
+        class:'px-4 py-3 rounded-xl bg-zinc-800 text-white font-semibold hover:bg-zinc-700 transition', 
+        onclick: ()=>{ clearCart(); refreshList(); } 
+      }, 'Tümünü Sil')
+    )
+  );
+
+  panel.appendChild(header);
+  panel.appendChild(list);
+  panel.appendChild(footer);
+  refreshList();
+}
+
+render();
+</script>
+</body>
+</html>
