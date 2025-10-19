@@ -21,9 +21,8 @@
           }
         }
       }
-
     </script>
-	  </style>
+    <style>
 	body { background:#0b0b0b; color:#fff; }
       .card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; }
 	.img {
@@ -70,6 +69,22 @@
       color: black;
     }
   }
+      
+	  /* Точное выравнивание ванильного мороженого */
+img[src*="icecream-vanilya"] {
+  object-position: center -48px; /* приподнимаем кадр, видно больше низа */
+}
+
+/* Чуть меньше сдвиг на десктопе */
+@media (min-width: 1024px) {
+  img[src*="icecream-vanilya"] { object-position: center -36px; }
+}
+
+/* Чуть больше сдвиг на мобильных, где карточка ниже */
+@media (max-width: 640px) {
+  img[src*="icecream-vanilya"] { object-position: center -60px; }
+}
+
     </style>
   </head>
   <body class="font-sans">
