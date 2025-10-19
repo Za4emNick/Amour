@@ -69,7 +69,14 @@
       color: black;
     }
   }
-      
+    /* Только для воды (Uludağ Premium) */
+.menu-item img[src*="su.jpg"],
+.img[src*="su.jpg"] {
+  object-fit: contain !important; /* сохраняет пропорции бутылки */
+  background-color: #000;         /* на случай пустых краёв */
+  padding: 8px;                   /* немного воздуха вокруг */
+}
+  
     </style>
   </head>
   <body class="font-sans">
