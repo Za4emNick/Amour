@@ -215,7 +215,7 @@
       function render() {
   root.innerHTML = '';
 
-  // Хедер
+  // 🔝 Хедер
   const header = h('div', { class:'sticky top-0 z-30 bg-black border-b border-white/10 shadow-sm' },
     h('div', { class:'max-w-6xl mx-auto h-24 px-6 flex items-center justify-between' },
       h('img', { src:'images/logo-segafredo.png', alt:'Segafredo', class:'h-12 w-auto opacity-90 hover:opacity-100 transition' }),
@@ -248,9 +248,13 @@
                 h('div', { class:'flex items-start justify-between gap-2' },
                   h('h3', { class:'font-medium text-sm' }, item.name),
                   h('div', { class:'text-xs font-semibold' },
-                    typeof item.price === 'number'
-                      ? fmt(item.price)
-                      : `S ${fmt(item.price.S)} / M ${fmt(item.price.M)}`
+                    (() => {
+                      const p = item.price || item.sizes;
+                      if (!p) return '';
+                      return typeof p === 'number'
+                        ? fmt(p)
+                        : `S ${fmt(p.S)} / M ${fmt(p.M)}`;
+                    })()
                   )
                 )
               )
@@ -285,9 +289,13 @@
                 h('div', { class:'flex items-start justify-between gap-3' },
                   h('h3', { class:'font-medium' }, item.name),
                   h('div', { class:'text-sm font-semibold' },
-                    typeof item.price === 'number'
-                      ? fmt(item.price)
-                      : `S ${fmt(item.price.S)} / M ${fmt(item.price.M)}`
+                    (() => {
+                      const p = item.price || item.sizes;
+                      if (!p) return '';
+                      return typeof p === 'number'
+                        ? fmt(p)
+                        : `S ${fmt(p.S)} / M ${fmt(p.M)}`;
+                    })()
                   )
                 )
               )
@@ -301,6 +309,7 @@
   root.appendChild(header);
   root.appendChild(layout);
 }
+
 
 // Назначаем делегирование событий для категорий после перерисовки 
 
