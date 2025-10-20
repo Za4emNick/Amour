@@ -214,7 +214,9 @@
       let active='hot';
 
       function setActive(k){ active=k; render(); window.scrollTo({top:0,behavior:'smooth'}); }
-
+// РЕНДЕР РЕНДЕР
+		// РЕНДЕР РЕНДЕР
+			// РЕНДЕР РЕНДЕР
       function render() {
   root.innerHTML = '';
 
@@ -290,7 +292,9 @@
               h('img', { class:'img', src:item.img, alt:item.name }),
               h('div', { class:'p-3' },
                 h('div', { class:'flex items-start justify-between gap-3' },
-                  h('h3', { class:'font-medium' }, item.name),
+                  h('h3', { 
+  					class: 'font-medium leading-tight', 
+  					innerHTML: item.name.replace(/^Frozen\s+/i, 'Frozen<br>')}),
                   h('div', { class:'text-sm font-semibold' },
                     (() => {
                       const p = item.price || item.sizes;
