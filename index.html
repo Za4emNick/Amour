@@ -73,6 +73,45 @@
   		aspect-ratio: 3 / 4 !important;
  		 object-fit: cover;
   		object-position: center;}
+		/* 🧠 Умный фикс для разных пропорций изображений */
+.card img {
+  width: 100%;
+  height: auto;
+  max-height: 320px; /* ограничиваем максимум по высоте */
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* выравнивание карточек по нижнему краю */
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* тянем описание вниз */
+.card .p-2,
+.card .p-3 {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* выравнивание строк в сетке */
+.grid {
+  align-items: start;
+}
+
+/* на мобильных убираем ограничение высоты */
+@media (max-width: 768px) {
+  .card img {
+    max-height: none;
+  }
+}
+
+		
 
 
     </style>
