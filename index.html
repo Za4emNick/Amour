@@ -796,36 +796,6 @@ document.addEventListener('click', e => {
 
 	render();
   }
-	function openModal(id) {
-  const modal = document.getElementById('item-modal');
-  const item = MENU.find(i => i.id === id);
-
-  const details = DETAILS[id] || {
-    desc: "Delicious and freshly prepared.",
-    ingredients: "Coffee, milk (varies by drink)",
-    cal: 180,
-    caffeine: "☕☕"
-  };
-
-  document.getElementById('modal-img').src = item.img;
-  document.getElementById('modal-name').textContent = translations[currentLang]?.[id] || item.name;
-  document.getElementById('modal-desc').textContent = details.desc;
-  document.getElementById('modal-ingredients').textContent = details.ingredients;
-  document.getElementById('modal-cal').textContent = details.cal;
-  document.getElementById('modal-caffeine').textContent = details.caffeine;
-  document.getElementById('modal-price').textContent =
-    typeof item.price === 'number'
-      ? fmt(item.price)
-      : `${fmt(item.sizes?.S)} / ${fmt(item.sizes?.M)}`;
-
-  modal.classList.remove("hidden");
-}
-
-function closeModal() {
-  document.getElementById('item-modal').classList.add("hidden");
-}
-
-
   // Обработчики кнопок
   document.getElementById('lang-tr').onclick = () => setLanguage('tr');
   document.getElementById('lang-en').onclick = () => setLanguage('en');
