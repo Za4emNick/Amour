@@ -380,8 +380,35 @@
 
   root.appendChild(header);
   root.appendChild(layout);
+  initReveals();		  
 }
+let revealObserver;
 
+function initReveals() {
+  // сбрасываем прошлый наблюдатель при каждом новом render()
+  if (revealObserver) revealObserver.disconnect();
+
+  // если у пользователя reduce motion — показываем без анимаций
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+    return;
+  }
+
+  revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {
+    root: null,
+    rootMargin: '0px 0px -10% 0px',
+    threshold: 0.15
+  });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+}
 
 // Назначаем делегирование событий для категорий после перерисовки 
 
