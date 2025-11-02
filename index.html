@@ -336,7 +336,7 @@ function render() {
 
     // Menu content
     h('main', { class:'col-span-8 sm:col-span-9 lg:col-span-10' },
-      h('div', { class:'grid sm:grid-cols-2 lg:grid-cols-2 gap-4' },
+      h('div', { class:'grid menu-grid grid-cols-3 gap-4' },
         ...MENU.filter(m=>m.cat===active).map(item =>
           h('article', { class:'card overflow-hidden reveal' },
             h('img', { class:'img', src:item.img, alt:item.name }),
