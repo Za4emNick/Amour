@@ -133,26 +133,6 @@
 	@media (prefers-reduced-motion: reduce) {
 	  .reveal { transition: none; transform: none; }
 	}
-	/* На мобилке — меню слева узкое, товары 2 в ряд */
-	@media (max-width: 768px) {
-	  .sidebar {
-	    width: 110px !important;
-	    min-width: 110px;
-	  }
-	
-	  .menu-grid {
-	    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-	  }
-	
-	  .card img {
-	    width: 100%;
-	    height: 160px;
-	    object-fit: cover;
-	  }
-	}
-
-
-
     </style>
   </head>
   <body class="font-sans">
@@ -305,86 +285,88 @@
 function render() {
   root.innerHTML = '';
 
-  // header
+  // Header
   const header = h('div', { class:'sticky top-0 z-30 bg-black border-b border-white/10 shadow-sm' },
     h('div', { class:'max-w-6xl mx-auto h-24 px-6 flex items-center justify-between' },
-      h('img', { src:'images/logo-segafredo.png', alt:'Segafredo', class:'h-12 w-auto opacity-90 hover:opacity-100 transition' }),
-      h('div', { class:'flex items-center justify-center flex-1' },
-        h('img', { src:'images/logo.png', alt:'Amour', class:'h-20 md:h-24 w-auto mx-auto opacity-100 brightness-100 contrast-125' })
-      ),
-      h('img', { src:'images/logo-alpedo.png', alt:'Alpedo', class:'h-14 w-auto opacity-90 hover:opacity-100 transition' })
+      h('img', { src:'images/logo-segafredo.png', class:'h-12 w-auto opacity-90' }),
+      h('img', { src:'images/logo.png', class:'h-20 md:h-24 w-auto mx-auto opacity-100' }),
+      h('img', { src:'images/logo-alpedo.png', class:'h-14 w-auto opacity-90' })
     )
   );
 
-  const layout = h('div', { class:'max-w-6xl mx-auto grid grid-cols-12 gap-4 px-4 pt-4 pb-24' },
+  let layout;
 
-    // Sidebar categories — ALWAYS LEFT
-    h('aside', { class:'sidebar col-span-4 sm:col-span-3 lg:col-span-2 mb-0' },
-      h('div', { class:'flex flex-col space-y-2 sticky top-20' },
+  // MOBILE LAYOUT
+  if (window.innerWidth <= 768) {
+    layout = h('div', { class:'flex' },
+
+      // Left menu
+      h('div', { id:'mobile-menu', class:'flex flex-col gap-2 p-2 w-[110px] sticky top-24 h-screen overflow-y-auto border-r border-white/10' },
         ...Object.values(CATS).map(c =>
           h('button', {
-            class:`px-3 py-2 rounded-lg border text-sm font-medium transition category-reveal w-full text-center ${
-              active===c.key 
-                ? 'bg-white text-black border-white'
-                : 'bg-transparent text-white border-white/20 hover:bg-white/10'
-            }`,
+            class:'text-[12px] px-2 py-2 rounded border ' + 
+            (active===c.key ? 'bg-white text-black' : 'bg-neutral-900 text-white hover:bg-white/10'),
             onclick:()=>setActive(c.key)
           }, c.title)
         )
-      )
-    ),
+      ),
 
-    // Menu content
-    h('main', { class:'col-span-8 sm:col-span-9 lg:col-span-10' },
-      h('div', { class:'grid menu-grid grid-cols-3 gap-4' },
-        ...MENU.filter(m=>m.cat===active).map(item =>
-          h('article', { class:'card overflow-hidden reveal' },
-            h('img', { class:'img', src:item.img, alt:item.name }),
-            h('div', { class:'p-3' },
-              h('div', { class:'flex items-start justify-between gap-3' },
-                (() => {
-                  const title = h('h3', { class:'leading-tight' });
-                  const translated = translations[currentLang]?.[item.id] || item.name;
-
-                  if (translated.startsWith('Frozen')) {
-                    title.innerHTML =
-                      `<span class="block font-semibold text-white text-[15px]">Frozen</span>
-                       <span class="block text-[13px] text-white/70 mt-0.5">${translated.replace(/^Frozen\s*/i, '')}</span>`;
-                  } else title.textContent = translated;
-
-                  return title;
-                })(),
-                h('div', { class:'text-sm font-semibold' },
-                  (() => {
-                    const p = item.price || item.sizes;
-                    if (!p) return '';
-                    return typeof p === 'number'
-                      ? fmt(p)
-                      : `S ${fmt(p.S)} / M ${fmt(p.M)}`;
-                  })()
-                )
+      // Content
+      h('div', { class:'flex-1 p-2 overflow-y-auto' },
+        h('div', { class:'grid grid-cols-2 gap-2' },
+          ...MENU.filter(m=>m.cat===active).map(item =>
+            h('article', { class:'card overflow-hidden reveal' },
+              h('img', { class:'img', src:item.img }),
+              h('div', { class:'p-2 text-xs flex justify-between' },
+                h('span',{},translations[currentLang]?.[item.id] || item.name),
+                h('span',{}, typeof item.price==='number' ? fmt(item.price) : '')
               )
             )
           )
         )
       )
-    )
-  );
+    );
+  }
+
+  // DESKTOP LAYOUT
+  else {
+    layout = h('div', { class:'max-w-6xl mx-auto grid grid-cols-12 gap-4 px-4 pt-4 pb-24' },
+
+      // Sidebar
+      h('aside', { class:'col-span-3' },
+        h('div', { class:'sticky top-36 space-y-1' },
+          ...Object.values(CATS).map(c =>
+            h('button', {
+              class:'w-full text-left px-3 py-2 rounded-lg border ' + 
+              (active===c.key ? 'bg-white text-black' : 'bg-transparent text-white hover:bg-white/10'),
+              onclick:()=>setActive(c.key)
+            }, c.title)
+          )
+        )
+      ),
+
+      // Grid
+      h('div', { class:'col-span-9' },
+        h('div', { class:'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' },
+          ...MENU.filter(m=>m.cat===active).map(item =>
+            h('article', { class:'card overflow-hidden reveal' },
+              h('img', { class:'img', src:item.img }),
+              h('div', { class:'p-3 flex justify-between' },
+                h('span',{},translations[currentLang]?.[item.id] || item.name),
+                h('span',{}, typeof item.price==='number' ? fmt(item.price) : '')
+              )
+            )
+          )
+        )
+      )
+    );
+  }
 
   root.appendChild(header);
   root.appendChild(layout);
-
-  // reveal items on scroll
   initReveals();
-
-  // stagger animation for category buttons
-  document.querySelectorAll('.category-reveal').forEach((el, i) => {
-    setTimeout(() => el.classList.add('in'), 60 * i);
-  });
-
-  // scroll to top on category change
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
 
 let revealObserver;
 
