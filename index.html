@@ -310,7 +310,7 @@
       }
 
       let active='hot';
-
+	  let currentLang = localStorage.getItem('amour_lang') || 'tr';
       function setActive(k){ active=k; render(); window.scrollTo({top:0,behavior:'smooth'}); }
 	  function openModal(id) {
 	    const modal = document.getElementById('item-modal');
