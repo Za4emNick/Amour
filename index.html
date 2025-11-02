@@ -22,6 +22,7 @@
         }
       }
     </script>
+	
     <style>
 	body { background:#0b0b0b; color:#fff; }
       .card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; }
@@ -133,6 +134,11 @@
 	@media (prefers-reduced-motion: reduce) {
 	  .reveal { transition: none; transform: none; }
 	}
+	
+	#item-modal.hidden { display: none; }
+	@keyframes fadeIn { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
+	.animate-fadeIn { animation: fadeIn .25s ease; }
+
     </style>
   </head>
   <body class="font-sans">
@@ -256,6 +262,38 @@
         { id:"lotus-cheesecake", cat:"desserts", name:"Lotus Cheesecake", price:220, img:"images/lotus-cheesecake.webp" },
         { id:"mini-cookies", cat:"desserts", name:"Atıştırmalık Kurabiye Çeşitleri", price:70, img:"images/mini-cookies.webp" },
       ];
+	const DETAILS = {
+	  "latte": {
+		desc: "Yumuşak içimli, sütlü espresso lezzeti.",
+		ingredients: "Espresso, süt",
+		cal: 190,
+		caffeine: "☕☕",
+	  },
+	  "cappuccino": {
+		desc: "Yoğun espresso, süt ve ince süt köpüğü.",
+		ingredients: "Espresso, süt",
+		cal: 150,
+		caffeine: "☕☕☕",
+	  },
+	  "san-sebastian": {
+		desc: "Karamelle zenginleştirilmiş kremalı cheesecake.",
+		ingredients: "Krem peynir, krema, yumurta, vanilya",
+		cal: 420,
+		caffeine: "—",
+	  },
+	  "espresso": {
+		desc: "Yoğun ve keskin kahve deneyimi.",
+		ingredients: "Espresso",
+		cal: 5,
+		caffeine: "☕☕☕☕",
+	  },
+	  "white-mocha": {
+		desc: "Beyaz çikolata aromalı tatlı latte.",
+		ingredients: "Espresso, süt, beyaz çikolata",
+		cal: 260,
+		caffeine: "☕☕",
+	  }
+	};
 
       const fmt = n => new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY',maximumFractionDigits:0}).format(n);
       const root = document.getElementById('root');
@@ -315,7 +353,7 @@ function render() {
       h('div', { class:'flex-1 p-2 overflow-y-auto' },
         h('div', { class:'grid grid-cols-2 gap-2' },
           ...MENU.filter(m=>m.cat===active).map(item =>
-            h('article', { class:'card overflow-hidden reveal' },
+			h('article', { class:'card overflow-hidden reveal cursor-pointer', onclick:()=>openModal(item.id) },
               h('img', { class:'img', src:item.img }),
               h('div', { class:'p-2 text-xs flex justify-between' },
                 h('span',{},translations[currentLang]?.[item.id] || item.name),
@@ -349,7 +387,7 @@ function render() {
       h('div', { class:'col-span-9' },
         h('div', { class:'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' },
           ...MENU.filter(m=>m.cat===active).map(item =>
-            h('article', { class:'card overflow-hidden reveal' },
+			h('article', { class:'card overflow-hidden reveal cursor-pointer', onclick:()=>openModal(item.id) },
               h('img', { class:'img', src:item.img }),
               h('div', { class:'p-3 flex justify-between' },
                 h('span',{},translations[currentLang]?.[item.id] || item.name),
@@ -726,6 +764,36 @@ document.addEventListener('click', e => {
       CATS.desserts.title = "DESSERTS";
     }
 
+	function openModal(id) {
+	  const modal = document.getElementById('item-modal');
+	  const item = MENU.find(i => i.id === id);
+
+	  const details = DETAILS[id] || {
+		desc: "Delicious and freshly prepared.",
+		ingredients: "Coffee, milk (varies by drink)",
+		cal: 180,
+		caffeine: "☕☕"
+	  };
+
+	  document.getElementById('modal-img').src = item.img;
+	  document.getElementById('modal-name').textContent = translations[currentLang]?.[id] || item.name;
+	  document.getElementById('modal-desc').textContent = details.desc;
+	  document.getElementById('modal-ingredients').textContent = details.ingredients;
+	  document.getElementById('modal-cal').textContent = details.cal;
+	  document.getElementById('modal-caffeine').textContent = details.caffeine;
+	  document.getElementById('modal-price').textContent =
+		typeof item.price === 'number'
+		  ? fmt(item.price)
+		  : `${fmt(item.sizes?.S)} / ${fmt(item.sizes?.M)}`;
+
+	  modal.classList.remove("hidden");
+	}
+
+	function closeModal() {
+	  document.getElementById('item-modal').classList.add("hidden");
+	}
+
+
 	render();
   }
 
@@ -741,6 +809,30 @@ document.addEventListener('click', e => {
   langModal.style.display = 'flex';
 </script>
 
+	<div id="item-modal" class="fixed inset-0 bg-black/80 backdrop-blur hidden items-center justify-center z-[9999]">
+	  <div class="bg-neutral-900 rounded-xl p-4 w-[90%] max-w-md border border-white/10 relative animate-fadeIn">
+
+		<!-- Close -->
+		<button onclick="closeModal()" class="absolute top-2 right-2 text-white/70 hover:text-white text-xl">×</button>
+
+		<img id="modal-img" class="w-full rounded-lg mb-3 shadow-lg" alt="Item">
+
+		<h2 id="modal-name" class="text-xl font-bold mb-1"></h2>
+		<p id="modal-desc" class="text-sm text-white/70 mb-2"></p>
+
+		<div class="text-sm mb-2">
+		  <b>Ingredients:</b>
+		  <span id="modal-ingredients" class="text-white/80"></span>
+		</div>
+
+		<div class="text-sm flex justify-between mb-2">
+		  <span><b>Calories:</b> <span id="modal-cal"></span> kcal</span>
+		  <span><b>Caffeine:</b> <span id="modal-caffeine"></span></span>
+		</div>
+
+		<div id="modal-price" class="text-lg font-bold text-white mt-2"></div>
+	  </div>
+	</div>
 
   </body>
 </html>
