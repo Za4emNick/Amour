@@ -303,7 +303,7 @@ function render() {
   const layout = h('div', { class:'max-w-6xl mx-auto grid grid-cols-12 gap-4 px-4 pt-4 pb-24' },
 
     // Sidebar categories — ALWAYS LEFT
-    h('aside', { class:'col-span-4 sm:col-span-3 lg:col-span-2 mb-0' },
+    h('aside', { class:'sidebar col-span-4 sm:col-span-3 lg:col-span-2 mb-0' },
       h('div', { class:'flex flex-col space-y-2 sticky top-20' },
         ...Object.values(CATS).map(c =>
           h('button', {
