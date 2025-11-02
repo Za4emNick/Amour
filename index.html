@@ -312,14 +312,44 @@
       let active='hot';
 
       function setActive(k){ active=k; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+	  function openModal(id) {
+	    const modal = document.getElementById('item-modal');
+	    const item = MENU.find(i => i.id === id);
+	
+	    const details = DETAILS[id] || {
+	      desc:"Delicious and freshly prepared.",
+	      ingredients:"Coffee, milk",
+	      cal:150,
+	      caffeine:"☕☕"
+	    };
+	
+	    document.getElementById('modal-img').src = item.img;
+	    document.getElementById('modal-name').textContent = translations[currentLang]?.[id] || item.name;
+	    document.getElementById('modal-desc').textContent = details.desc;
+	    document.getElementById('modal-ingredients').textContent = details.ingredients;
+	    document.getElementById('modal-cal').textContent = details.cal;
+	    document.getElementById('modal-caffeine').textContent = details.caffeine;
+	    document.getElementById('modal-price').textContent =
+	      typeof item.price==='number'
+	        ? fmt(item.price)
+	        : `${fmt(item.sizes?.S)} / ${fmt(item.sizes?.M)}`;
+	
+		modal.classList.add("show");
+		modal.classList.remove("hidden");
+
+	  }
+	
+	  function closeModal(){
+		  const modal = document.getElementById('item-modal');
+		  modal.classList.remove("show");
+		  modal.classList.add("hidden");
+		}
+		 
+	
+	  window.openModal = openModal;
+	  window.closeModal = closeModal;	
 																				// РЕНДЕР РЕНДЕР
-												// РЕНДЕР РЕНДЕР
-			// РЕНДЕР РЕНДЕР
-									// РЕНДЕР РЕНДЕР
-									// РЕНДЕР РЕНДЕР
-												// РЕНДЕР РЕНДЕР
-															// РЕНДЕР РЕНДЕР
-																		// РЕНДЕР РЕНДЕР// РЕНДЕР РЕНДЕР			// РЕНДЕР РЕНДЕР			// РЕНДЕР РЕНДЕР			// РЕНДЕР РЕНДЕР
+						
 function render() {
   root.innerHTML = '';
 
@@ -486,8 +516,7 @@ document.addEventListener('click', e => {
 
 
 <script>
-  const LANG_KEY = 'amour_lang';
-  const translations = {
+	 const translations = {
 	tr: {
 		"cay":"Çay","fincan-cay":"Fincan Çay","takeaway-cay":"Takeaway Çay","salep":"Salep",
 		"sicak-cikolata":"Sıcak Çikolata","beyaz-sicak-cikolata":"Beyaz Sıcak Çikolata",
@@ -655,6 +684,7 @@ document.addEventListener('click', e => {
 		"lotus-cheesecake":"چیزکیک لوتوس","mini-cookies":"کوکی کوچک"
 	  }
 	};
+  const LANG_KEY = 'amour_lang';
   const langModal = document.getElementById('lang-modal');
 
   function setLanguage(lang) {
@@ -763,37 +793,6 @@ document.addEventListener('click', e => {
       CATS.extras.title = "SUPPLÉMENTS";
       CATS.desserts.title = "DESSERTS";
     }
-
-	function openModal(id) {
-	  const modal = document.getElementById('item-modal');
-	  const item = MENU.find(i => i.id === id);
-
-	  const details = DETAILS[id] || {
-		desc: "Delicious and freshly prepared.",
-		ingredients: "Coffee, milk (varies by drink)",
-		cal: 180,
-		caffeine: "☕☕"
-	  };
-
-	  document.getElementById('modal-img').src = item.img;
-	  document.getElementById('modal-name').textContent = translations[currentLang]?.[id] || item.name;
-	  document.getElementById('modal-desc').textContent = details.desc;
-	  document.getElementById('modal-ingredients').textContent = details.ingredients;
-	  document.getElementById('modal-cal').textContent = details.cal;
-	  document.getElementById('modal-caffeine').textContent = details.caffeine;
-	  document.getElementById('modal-price').textContent =
-		typeof item.price === 'number'
-		  ? fmt(item.price)
-		  : `${fmt(item.sizes?.S)} / ${fmt(item.sizes?.M)}`;
-
-	  modal.classList.remove("hidden");
-	}
-
-	function closeModal() {
-	  document.getElementById('item-modal').classList.add("hidden");
-	}
-
-
 	render();
   }
   // Обработчики кнопок
@@ -832,6 +831,23 @@ document.addEventListener('click', e => {
 		<div id="modal-price" class="text-lg font-bold text-white mt-2"></div>
 	  </div>
 	</div>
+<script>
+  const modalBg = document.getElementById('item-modal');
+
+  // закрытие модалки по клику на фон
+  modalBg.addEventListener('click', (e) => {
+    if (e.target === modalBg) closeModal();
+  });
+</script>
+
+<style>
+  #item-modal {
+    display: none;
+  }
+  #item-modal.show {
+    display: flex;
+  }
+</style>
 
   </body>
 </html>
