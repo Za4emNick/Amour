@@ -68,7 +68,7 @@
       background: white;
       color: black;
     }
-}
+  }
 	.img[src*="su.jpg"],[src*="soda.jpg"], [src*="sikma-portakal.jpg"], [src*="frozen.jpg"], [src*="magnolia.jpg"], [src*="profiterol.jpg"],
 		[src*="lotus-cup.jpg"], [src*="oreo-cup.jpg"], [src*="cold-brew.jpg"], [src*="iced-white-mocha.jpg"],
 		[src*="limonata.jpg"], [src*="italian-soda.jpg"], [src*="churchill.jpg"], [src*="enerji-icecek.jpg"], [src*="mesrubatlar.jpg"]
@@ -79,60 +79,60 @@
   		aspect-ratio: 3 / 4 !important;
  		 object-fit: cover;
   		object-position: center;}
-			/* 🧠 Умный фикс для разных пропорций изображений */
-	.card img {
-	  width: 100%;
-	  height: auto;
-	  max-height: 320px; /* ограничиваем максимум по высоте */
-	  object-fit: cover;
-	  border-radius: 12px;
-	}
+		/* 🧠 Умный фикс для разных пропорций изображений */
+.card img {
+  width: 100%;
+  height: auto;
+  max-height: 320px; /* ограничиваем максимум по высоте */
+  object-fit: cover;
+  border-radius: 12px;
+}
 
-	/* выравнивание карточек по нижнему краю */
-	.card {
-	  display: flex;
-	  flex-direction: column;
-	  justify-content: space-between;
-	  height: 100%;
-	}
+/* выравнивание карточек по нижнему краю */
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
 
-	/* тянем описание вниз */
-	.card .p-2,
-	.card .p-3 {
-	  flex-grow: 1;
-	  display: flex;
-	  flex-direction: column;
-	  justify-content: space-between;
-	}
+/* тянем описание вниз */
+.card .p-2,
+.card .p-3 {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
-	/* выравнивание строк в сетке */
-	.grid {
-	  align-items: start;
-	}
+/* выравнивание строк в сетке */
+.grid {
+  align-items: start;
+}
 
-	/* на мобильных убираем ограничение высоты */
-	@media (max-width: 768px) {
-	  .card img {
-		max-height: none;
-	  }
-	}
+/* на мобильных убираем ограничение высоты */
+@media (max-width: 768px) {
+  .card img {
+    max-height: none;
+  }
+}
+/* === Reveal-on-scroll === */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px) scale(.98);
+  transition: opacity .6s ease, transform .6s ease;
+  will-change: opacity, transform;
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: none; transform: none; }
+}
 
 		
 
-	/* === Reveal-on-scroll === */
-	.reveal {
-	  opacity: 0;
-	  transform: translateY(16px) scale(.98);
-	  transition: opacity .6s ease, transform .6s ease;
-	  will-change: opacity, transform;
-	}
-	.reveal.in {
-	  opacity: 1;
-	  transform: none;
-	}
-	@media (prefers-reduced-motion: reduce) {
-	  .reveal { transition: none; transform: none; }
-	}
 
     </style>
   </head>
@@ -275,18 +275,13 @@
       let active='hot';
 
       function setActive(k){ active=k; render(); window.scrollTo({top:0,behavior:'smooth'}); }
-																				// РЕНДЕР РЕНДЕР
-												// РЕНДЕР РЕНДЕР
+// РЕНДЕР РЕНДЕР
+		// РЕНДЕР РЕНДЕР
 			// РЕНДЕР РЕНДЕР
-									// РЕНДЕР РЕНДЕР
-									// РЕНДЕР РЕНДЕР
-												// РЕНДЕР РЕНДЕР
-															// РЕНДЕР РЕНДЕР
-																		// РЕНДЕР РЕНДЕР// РЕНДЕР РЕНДЕР			// РЕНДЕР РЕНДЕР			// РЕНДЕР РЕНДЕР			// РЕНДЕР РЕНДЕР
-function render() {
+      function render() {
   root.innerHTML = '';
 
-  // header
+  // 🔝 Хедер
   const header = h('div', { class:'sticky top-0 z-30 bg-black border-b border-white/10 shadow-sm' },
     h('div', { class:'max-w-6xl mx-auto h-24 px-6 flex items-center justify-between' },
       h('img', { src:'images/logo-segafredo.png', alt:'Segafredo', class:'h-12 w-auto opacity-90 hover:opacity-100 transition' }),
@@ -297,76 +292,110 @@ function render() {
     )
   );
 
-  const layout = h('div', { class:'max-w-6xl mx-auto grid grid-cols-12 gap-4 px-4 pt-4 pb-24' },
+  let layout;
 
-    // Sidebar categories — ALWAYS LEFT
-    h('aside', { class:'col-span-4 sm:col-span-3 lg:col-span-2 mb-0' },
-      h('div', { class:'flex flex-col space-y-2 sticky top-20' },
+  // 📱 Мобильная версия
+  if (window.innerWidth <= 768) {
+    layout = h('div', { id:'mobile-layout', class:'max-w-full mx-auto px-2 pt-4 pb-24' },
+      h('div', { id:'mobile-menu' },
         ...Object.values(CATS).map(c =>
           h('button', {
-            class:`px-3 py-2 rounded-lg border text-sm font-medium transition category-reveal w-full text-center ${
-              active===c.key 
-                ? 'bg-white text-black border-white'
-                : 'bg-transparent text-white border-white/20 hover:bg-white/10'
-            }`,
+            class: (active===c.key ? 'active ' : '') + 'transition',
             onclick:()=>setActive(c.key)
           }, c.title)
         )
-      )
-    ),
-
-    // Menu content
-    h('main', { class:'col-span-8 sm:col-span-9 lg:col-span-10' },
-      h('div', { class:'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' },
-        ...MENU.filter(m=>m.cat===active).map(item =>
-          h('article', { class:'card overflow-hidden reveal' },
-            h('img', { class:'img', src:item.img, alt:item.name }),
-            h('div', { class:'p-3' },
-              h('div', { class:'flex items-start justify-between gap-3' },
-                (() => {
-                  const title = h('h3', { class:'leading-tight' });
-                  const translated = translations[currentLang]?.[item.id] || item.name;
-
-                  if (translated.startsWith('Frozen')) {
-                    title.innerHTML =
-                      `<span class="block font-semibold text-white text-[15px]">Frozen</span>
-                       <span class="block text-[13px] text-white/70 mt-0.5">${translated.replace(/^Frozen\s*/i, '')}</span>`;
-                  } else title.textContent = translated;
-
-                  return title;
-                })(),
-                h('div', { class:'text-sm font-semibold' },
+      ),
+      h('div', { id:'mobile-content', class:'overflow-y-auto' },
+        h('div', { class:'grid grid-cols-2 gap-3' },
+          ...MENU.filter(m=>m.cat===active).map(item =>
+            h('article', { class:'card overflow-hidden reveal' },
+              h('img', { class:'img', src:item.img, alt:item.name }),
+              h('div', { class:'p-2' },
+                h('div', { class:'flex items-start justify-between gap-2' },
                   (() => {
-                    const p = item.price || item.sizes;
-                    if (!p) return '';
-                    return typeof p === 'number'
-                      ? fmt(p)
-                      : `S ${fmt(p.S)} / M ${fmt(p.M)}`;
-                  })()
+  					const title = h('h3', { class: 'leading-tight' });
+						const translated = translations[currentLang]?.[item.id] || item.name;
+
+						if (translated.startsWith('Frozen')) {
+						  title.innerHTML = ` <span class="block font-semibold text-white text-[15px] tracking-wide">Frozen</span><span class="block text-[13px] text-white/70 mt-0.5">${translated.replace(/^Frozen\s*/i, '')}</span> `;
+						} 
+						else {
+						  title.textContent = translated;
+						}
+						return title;})(),
+                  h('div', { class:'text-xs font-semibold' },
+                    (() => {
+                      const p = item.price || item.sizes;
+                      if (!p) return '';
+                      return typeof p === 'number'
+                        ? fmt(p)
+                        : `S ${fmt(p.S)} / M ${fmt(p.M)}`;
+                    })()
+                  )
                 )
               )
             )
           )
         )
       )
-    )
-  );
+    );
+  }
+
+  // 💻 Десктоп-версия
+  else {
+    layout = h('div', { class:'max-w-6xl mx-auto grid grid-cols-12 gap-4 px-4 pt-4 pb-24' },
+      h('aside', { class:'hidden md:block col-span-3' },
+        h('div', { class:'sticky top-36 space-y-1' },
+          ...Object.values(CATS).map(c =>
+            h('button', {
+              class:'w-full text-left px-3 py-2 rounded-lg border ' + 
+              (active===c.key ? 'bg-white text-black' : 'bg-transparent text-white hover:bg-white/10') + 
+              ' border-white/10',
+              onclick:()=>setActive(c.key)
+            }, c.title)
+          )
+        )
+      ),
+      h('div', { class:'col-span-12 md:col-span-9' },
+        h('div', { class:'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' },
+          ...MENU.filter(m=>m.cat===active).map(item =>
+            h('article', { class:'card overflow-hidden reveal' },
+              h('img', { class:'img', src:item.img, alt:item.name }),
+              h('div', { class:'p-3' },
+                h('div', { class:'flex items-start justify-between gap-3' },
+                  (() => {
+  					const title = h('h3', { class: 'leading-tight' });
+						const translated = translations[currentLang]?.[item.id] || item.name;
+
+						if (translated.startsWith('Frozen')) {
+						  title.innerHTML = ` <span class="block font-semibold text-white text-[15px] tracking-wide">Frozen</span><span class="block text-[13px] text-white/70 mt-0.5">${translated.replace(/^Frozen\s*/i, '')}</span> `;
+						} 
+						else {
+						  title.textContent = translated;
+						}
+						return title;})(),
+                  h('div', { class:'text-sm font-semibold' },
+                    (() => {
+                      const p = item.price || item.sizes;
+                      if (!p) return '';
+                      return typeof p === 'number'
+                        ? fmt(p)
+                        : `S ${fmt(p.S)} / M ${fmt(p.M)}`;
+                    })()
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    );
+  }
 
   root.appendChild(header);
   root.appendChild(layout);
-
-  // reveal items on scroll
-  initReveals();
-
-  // stagger animation for category buttons
-  document.querySelectorAll('.category-reveal').forEach((el, i) => {
-    setTimeout(() => el.classList.add('in'), 60 * i);
-  });
-
-  // scroll to top on category change
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  initReveals();		  
 }
-
 let revealObserver;
 
 function initReveals() {
@@ -725,7 +754,7 @@ document.addEventListener('click', e => {
       CATS.desserts.title = "DESSERTS";
     }
 
-	render();
+    render();
   }
 
   // Обработчики кнопок
