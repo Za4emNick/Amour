@@ -469,10 +469,47 @@
 		  descUI.style.display = "none";
 		}
 
-
-
         const ingList = document.getElementById("modalIng");
         ingList.innerHTML = ingredients.length ? ingredients.map(i=>`<li>${i}</li>`).join("") : '<li>Bilgi yakında</li>';
+		
+		    // caffeine (MENU priority → ENRICH → null)
+		let caffeine = null;
+		if (typeof item.caffeine === "number") {
+		  caffeine = item.caffeine;
+		} else if (typeof enrich.caffeine === "number") {
+		  caffeine = enrich.caffeine;
+		}
+
+		const caffeineTitle = document.getElementById('caffeineTitle');
+		const dotsWrap = document.getElementById('caffeineDots');
+		const mgEl = document.getElementById('caffeineMg');
+
+		const caffeineCats = ['coffees', 'filter', 'iced'];
+		const showCat = caffeineCats.includes(item.cat);
+
+		if (showCat && caffeine !== null) {
+		  caffeineTitle.style.display = "block";
+		  dotsWrap.style.display = "flex";
+		  mgEl.style.display = "block";
+
+		  const dots = Math.min(5, Math.max(1, Math.ceil(caffeine / 50)));
+		  dotsWrap.innerHTML = "";
+		  for (let i = 0; i < 5; i++) {
+			dotsWrap.innerHTML += `
+			  <span style="
+				width:8px;height:8px;margin-right:4px;
+				border-radius:50%;
+				border:1px solid #fff;
+				display:inline-block;
+				background:${i < dots ? '#fff' : 'transparent'}"></span>`;
+		  }
+		  mgEl.textContent = caffeine + " mg";
+		} else {
+		  caffeineTitle.style.display = "none";
+		  dotsWrap.style.display = "none";
+		  mgEl.style.display = "none";
+		}
+
 
         const modal = document.getElementById("drinkModal");
         modal.classList.remove("hidden");
