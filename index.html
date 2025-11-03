@@ -146,15 +146,15 @@
         { id:"su", cat:"cold", name:"Su", price:50, img:"images/su.webp" },
         { id:"soda", cat:"cold", name:"Soda", price:100, img:"images/soda.webp" },
         { id:"sikma-portakal", cat:"cold", name:"Sıkma Portakal Suyu", price:180, img:"images/sikma-portakal.webp" },  
-        { id:"frozen", cat:"cold", name:"Frozen mango, çilek, şeftali, yaban mersini, frambuaz, orman meyveli", price:190, img:"images/frozen.webp" },
-        { id:"italian-soda", cat:"cold", name:"İtalian Soda (nar, çilek, mango, böğürtlen)", price:190, img:"images/italian-soda.webp" },
-        { id:"limonata", cat:"cold", name:"Limonata", price:180, img:"images/limonata.webp" },
-        { id:"aromali-limonata", cat:"cold", name:"Aromalı Limonata (çilek, nar, nane)", price:180, img:"images/aromali-limonata.webp" },
+        { id:"frozen", cat:"cold", name:"Frozen", price:190, img:"images/frozen.webp" , desc:"mango, çilek, şeftali, yaban mersini, frambuaz, orman meyveli"}, 
+        { id:"italian-soda", cat:"cold", name:"İtalian Soda", price:190, img:"images/italian-soda.webp",desc:"nar, çilek, mango, böğürtlen" },
+        { id:"limonata", cat:"cold", name:"Limonata", price:180, img:"images/limonata.webp", desc:"nar, çilek, mango, böğürtlen" },
+        { id:"aromali-limonata", cat:"cold", name:"Aromalı Limonata", price:180, img:"images/aromali-limonata.webp", desc:"çilek, nar, nane" },
         { id:"churchill", cat:"cold", name:"Churchill", price:100, img:"images/churchill.webp" },
         { id:"enerji-icecek", cat:"cold", name:"Enerji İçeceği", price:170, img:"images/enerji-icecek.webp" },
-        { id:"mesrubatlar", cat:"cold", name:"Meşrubatlar (cola turka, uludağ portakal, uludağ gazoz, ice tea)", price:120, img:"images/mesrubatlar.webp" },
-        { id:"milkshake", cat:"cold", name:"Milkshake (çikolata, çilek, muz, vanilya, oreo)", price:190, img:"images/milkshake.webp" },
-        { id:"meyveli-soda", cat:"cold", name:"Meyveli Soda (limon, elma, nar, karpuz çilek)", price:100, img:"images/meyveli-soda.webp" },
+        { id:"mesrubatlar", cat:"cold", name:"Meşrubatlar", price:120, img:"images/mesrubatlar.webp", desc:"cola turka, uludağ portakal, uludağ gazoz, ice tea" },
+        { id:"milkshake", cat:"cold", name:"Milkshake", price:190, img:"images/milkshake.webp", desc:"çikolata, çilek, muz, vanilya, oreo" },
+        { id:"meyveli-soda", cat:"cold", name:"Meyveli Soda", price:100, img:"images/meyveli-soda.webp", desc:"limon, elma, nar, karpuz çilek" },
         
         // DONDURMA
         { id:"icecream-vanilya", cat:"icecream", name:"Vanilya Dondurma", price:60, img:"images/icecream-vanilya.webp" },
@@ -268,7 +268,7 @@
         { id:"iced-caramel-latte", cat:"iced", name:"Iced Caramel Latte", price:190, img:"images/iced-caramel-latte.webp" },
         { id:"iced-white-mocha", cat:"iced", name:"Iced White Mocha", price:190, img:"images/iced-white-mocha.webp" },
         { id:"cold-brew", cat:"iced", name:"Cold Brew", price:190, img:"images/cold-brew.webp" },
-        { id:"frappe", cat:"iced", name:"Frappe (çikolata, karamel, vanilya, çilek)", price:190, img:"images/frappe.webp" }, 
+        { id:"frappe", cat:"iced", name:"Frappe", price:190, img:"images/frappe.webp", desc:"çikolata, karamel, vanilya, çilek" }, 
         { id:"italian-frappe", cat:"iced", name:"Italian Frappe", price:190, img:"images/italian-frappe.webp" },
         { id:"greek-frappe", cat:"iced", name:"Greek Frappe", price:190, img:"images/greek-frappe.webp" },
         { id:"ice-nutellatte", cat:"iced", name:"Ice Nutellatte", price:200, img:"images/ice-nutellatte.webp" },
@@ -450,6 +450,18 @@
         const ingredients = item.ingredients || [];
         document.getElementById("modalImg").src = item.img || imgEl.src;
         document.getElementById("modalName").textContent = trName;
+		// ✅ Flavor chips from desc
+		const desc = item.desc;
+		const descUI = document.getElementById("modalDescUI");
+		if (desc && desc.length) {
+		  descUI.innerHTML = desc.split(",").map(d =>
+			`<span class="px-2 py-1 bg-white/10 rounded-full border border-white/20">${d.trim()}</span>`
+		  ).join("");
+		  descUI.style.display = "flex";
+		} else {
+		  descUI.style.display = "none";
+		}
+
         const ingList = document.getElementById("modalIng");
         ingList.innerHTML = ingredients.length ? ingredients.map(i=>`<li>${i}</li>`).join("") : '<li>Bilgi yakında</li>';
 
@@ -654,21 +666,33 @@
     </script>
 
     <!-- ✅ Product Modal (внутри body, перед </body>) -->
-    <div id="drinkModal" class="fixed inset-0 z-[9999] hidden bg-black/70 backdrop-blur-sm items-center justify-center">
-      <div class="bg-[#111] text-white p-5 rounded-2xl max-w-xs w-full relative animate-[zoom_.25s_ease]">
-        <button id="modalClose" class="absolute top-2 right-2 text-xl text-white/70 hover:text-white">×</button>
-        <img id="modalImg" src="" class="w-full rounded-xl mb-4"/>
-        <h3 id="modalName" class="text-xl font-semibold mb-2"></h3>
-        <p id="modalDesc" style="display:none" class="text-sm text-white/70 mb-4"></p>
-        <h4 class="text-sm font-semibold mb-1">İçindekiler</h4>
-        <ul id="modalIng" class="text-xs text-white/80 mb-4 space-y-1"></ul>
+	<!-- ✅ Product Modal (внутри body, перед </body>) -->
+	<div id="drinkModal" class="fixed inset-0 z-[9999] hidden bg-black/70 backdrop-blur-sm items-center justify-center">
+	  <div class="bg-[#111] text-white p-5 rounded-2xl max-w-xs w-full relative animate-[zoom_.25s_ease]">
+		<button id="modalClose" class="absolute top-2 right-2 text-xl text-white/70 hover:text-white">×</button>
+
+		<img id="modalImg" src="" class="w-full rounded-xl mb-4"/>
+
+		<h3 id="modalName" class="text-xl font-semibold mb-2"></h3>
+
+		<!-- ✅ Chips block for flavors -->
+		<div id="modalDescUI" class="flex flex-wrap gap-2 text-xs text-white/80 mb-3"></div>
+
+		<!-- (old desc remains hidden just in case) -->
+		<p id="modalDesc" style="display:none"></p>
+
+		<h4 class="text-sm font-semibold mb-1">İçindekiler</h4>
+		<ul id="modalIng" class="text-xs text-white/80 mb-4 space-y-1"></ul>
+
 		<!-- Caffeine -->
 		<h4 id="caffeineTitle" class="text-sm font-semibold mb-1">Kafein</h4>
 		<div id="caffeineWrap">
-			<div id="caffeineDots" class="flex gap-1 mb-1"></div>
-			<div id="caffeineMg" class="text-xs text-white/60 mb-2"></div>
-      </div>
-    </div>
+		  <div id="caffeineDots" class="flex gap-1 mb-1"></div>
+		  <div id="caffeineMg" class="text-xs text-white/60 mb-2"></div>
+		</div>
+	  </div>
+	</div>
+
 	<script>
 	  const modal = document.getElementById("drinkModal");
 	  const closeBtn = document.getElementById("modalClose");
