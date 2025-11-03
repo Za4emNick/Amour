@@ -75,7 +75,7 @@
       [src*="soda.webp"], [src*="meyveli-soda.webp"], [src*="milkshake.webp"], [src*="san-sebastian.webp"], [src*="brownie.webp"], [src*="iced-caramel-latte.webp"], 
       [src*="amour-milano.webp"], [src*="amour-special.webp"], [src*="amour-melo.webp"], [src*="amour-vibe.webp"],
       [src*="amour-sky.webp"], [src*="amour-lime.webp"], [src*="amour-wild-berry.webp"], [src*="amour-hibiscus.webp"], [src*="amour-mango-portakal.webp"], [src*="amour-dark.webp"],
-      [src*="amour-lime-zero.webp"], [src*="iced-mocha.webp"], [src*="fistikli-cup.webp"], [src*="lotus-cheesecake.webp"], [src*="iced-americano.webp"], [src*="iced-latte.webp"]{
+      [src*="amour-lime-zero.webp"], [src*="iced-mocha.webp"], [src*="fistikli-cup.webp"], [src*="lotus-cheesecake.webp"], [src*="iced-americano.webp"], [src*="iced-latte.webp"], [src*="mini-cookies.webp"] {
         aspect-ratio: 3 / 4 !important;
         object-fit: cover;
         object-position: center;
@@ -353,7 +353,13 @@
                     h('img', { class:'img', src:item.img, dataset:{ id:item.id } }),
                     h('div', { class:'p-2 text-xs flex justify-between' },
                       h('span',{}, window.translations?.[window.currentLang]?.[item.id] || item.name),
-                      h('span',{}, typeof item.price==='number' ? fmt(item.price) : '')
+                      h('span',{}, typeof item.price==='number'
+            ? fmt(item.price)
+            : item.price && item.price.S
+              ? `S ${fmt(item.price.S)} / M ${fmt(item.price.M)}`
+              : item.sizes && item.sizes.S
+                ? `S ${fmt(item.sizes.S)} / M ${fmt(item.sizes.M)}`
+                : '')
                     )
                   )
                 )
@@ -387,7 +393,13 @@
                     h('img', { class:'img', src:item.img, dataset:{ id:item.id } }),
                     h('div', { class:'p-3 flex justify-between' },
                       h('span',{}, window.translations?.[window.currentLang]?.[item.id] || item.name),
-                      h('span',{}, typeof item.price==='number' ? fmt(item.price) : '')
+                      h('span',{}, typeof item.price==='number'
+            ? fmt(item.price)
+            : item.price && item.price.S
+              ? `S ${fmt(item.price.S)} / M ${fmt(item.price.M)}`
+              : item.sizes && item.sizes.S
+                ? `S ${fmt(item.sizes.S)} / M ${fmt(item.sizes.M)}`
+                : '')
                     )
                   )
                 )
