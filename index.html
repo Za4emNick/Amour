@@ -460,12 +460,13 @@
 
        // ingredients (MENU priority → ENRICH → empty)
 		const enrich = (typeof AMOUR_ENRICH !== 'undefined' && AMOUR_ENRICH[id]) ? AMOUR_ENRICH[id] : {};
-		const ingredients = item.ingredients || enrich.ingredients || [];
+		const ingredients = enrich.ingredients || item.ingredients || [];
+
 		document.getElementById("modalImg").src = item.img || imgEl.src;
 		document.getElementById("modalName").textContent = trName;
 
 		// flavor chips from desc
-		const desc = item.desc || enrich.desc || "";
+		const desc = enrich.desc || item.desc || "";
 		const descUI = document.getElementById("modalDescUI");
 
 
@@ -486,11 +487,12 @@
 		
 		    // caffeine (MENU priority → ENRICH → null)
 		let caffeine = null;
-		if (typeof item.caffeine === "number") {
-		  caffeine = item.caffeine;
-		} else if (typeof enrich.caffeine === "number") {
+		if (typeof enrich.caffeine === "number") {
 		  caffeine = enrich.caffeine;
+		} else if (typeof item.caffeine === "number") {
+		  caffeine = item.caffeine;
 		}
+
 
 		const caffeineTitle = document.getElementById('caffeineTitle');
 		const dotsWrap = document.getElementById('caffeineDots');
@@ -868,14 +870,16 @@ const AMOUR_ENRICH = {
 "mini-cookies":{"desc":"Atıştırmalık mini kurabiyeler.","ingredients":["Un","Tereyağı","Şeker","Çikolata"]}
 };
 function enrichItem(item) {
-  const enrich = AMOUR_ENRICH[item.id];
-  if (!enrich) return item;
+  const enrich = AMOUR_ENRICH[item.id] || {};
 
   return {
     ...item,
-    desc: item.desc || enrich.desc || "",
-    ingredients: item.ingredients || enrich.ingredients || [],
-    caffeine: item.caffeine || enrich.caffeine || null
+    desc: enrich.desc || item.desc || "",
+    ingredients: enrich.ingredients || item.ingredients || [],
+    caffeine: 
+      typeof enrich.caffeine === "number"
+      ? enrich.caffeine
+      : item.caffeine ?? null
   };
 }
 
