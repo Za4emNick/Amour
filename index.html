@@ -763,6 +763,7 @@
 <script>
 // === Modal + Data Enrichment ===
 const AMOUR_ENRICH = {
+//КОФЕ
 "espresso":{"desc":"Yoğun ve kısa bir espresso.","ingredients":["Espresso"],"caffeine":63},
 "espresso-macchiato":{"desc":"Espresso üzerine az süt köpüğü.","ingredients":["Espresso","Süt köpüğü"],"caffeine":63},
 "americano":{"desc":"Espresso ve sıcak su ile hafif ve uzun içim.","ingredients":["Espresso","Sıcak su"],"caffeine":95},
@@ -780,6 +781,7 @@ const AMOUR_ENRICH = {
 "double-turk":{"desc":"Daha yoğun, uzun kalıcılık.","ingredients":["Türk kahvesi (duble)","Su"],"caffeine":120},
 "dibek":{"desc":"Yumuşak içimli, odunsu notalar.","ingredients":["Dibek kahvesi","Su"],"caffeine":60},
 "menengic":{"desc":"Kafeinsiz, hafif ve aromatik.","ingredients":["Menengiç","Süt veya su"]},
+//фильтркофе
 "kenya":{"desc":"Canlı asidite, meyvemsi notalar.","ingredients":["Filtre kahve","Su"],"caffeine":120},
 "colombia":{"desc":"Dengeli gövde, kakao ve fındık izi.","ingredients":["Filtre kahve","Su"],"caffeine":115},
 "ethiopia":{"desc":"Çiçeksi ve narenciye dokunuşları.","ingredients":["Filtre kahve","Su"],"caffeine":120},
@@ -787,6 +789,7 @@ const AMOUR_ENRICH = {
 "guatemala":{"desc":"Kakao ve hafif baharat notaları.","ingredients":["Filtre kahve","Su"],"caffeine":115},
 "v60":{"desc":"Hafif gövde, net aromalar (V60).","ingredients":["Öğütülmüş kahve","Su"],"caffeine":120},
 "chemex":{"desc":"Temiz ve ipeksi (Chemex).","ingredients":["Öğütülmüş kahве","Su"],"caffeine":120},
+//кофе холодное
 "iced-americano":{"desc":"Buzlu, ferah ve net kahve tadı.","ingredients":["Espresso","Su","Buz"],"caffeine":95},
 "iced-latte":{"desc":"Soğuk sütle yumuşak kahve.","ingredients":["Espresso","Süt","Buz"],"caffeine":80},
 "iced-mocha":{"desc":"Çikolatalı buzlu latte.","ingredients":["Espresso","Süt","Çikolata","Buz"],"caffeine":90},
@@ -799,6 +802,7 @@ const AMOUR_ENRICH = {
 "ice-nutellatte":{"desc":"Fındık-kakaolu buzlu latte.","ingredients":["Espresso","Süt","Fındık-kakao kreması","Buz"],"caffeine":80},
 "ice-chai-latte":{"desc":"Baharatlı, sütlü ve ferah.","ingredients":["Çay","Süt","Baharat","Buz"]},
 "affogato":{"desc":"Dondurma üstüne sıcak espresso.","ingredients":["Espresso","Dondurma"],"caffeine":63},
+//Горячие напитки
 "cay":{"desc":"Geleneksel ve taze demlenmiş siyah çay.","ingredients":["Siyah çay","Su"]},
 "fincan-cay":{"desc":"Bardakta geleneksel çay","ingredients":["Siyah çay","Su"]},
 "takeaway-cay":{"desc":"Kağıt bardakta çay","ingredients":["Siyah çay","Su"]},
@@ -807,6 +811,7 @@ const AMOUR_ENRICH = {
 "beyaz-sicak-cikolata":{"desc":"Kremsi beyaz çikolata aroması.","ingredients":["Beyaz çikolata","Süt"]},
 "chai-latte":{"desc":"Baharatlı Hint çayı, sütlü ve sıcak.","ingredients":["Çay","Süt","Chai baharatı"]},
 "balli-sut":{"desc":"Doğal bal ile sıcak süt uyumu.","ingredients":["Süt","Bal"]},
+//холодные напитки
 "su":{"desc":"Temiz ve ferah.","ingredients":["Su"]},
 "soda":{"desc":"Hafif ve baloncuklu ferahlık.","ingredients":["Soda"]},
 "sikma-portakal":{"desc":"Taze sıkım portakal suyu.","ingredients":["Portakal"]},
@@ -819,6 +824,7 @@ const AMOUR_ENRICH = {
 "mesrubatlar":{"desc":"Klasik soğuk meşrubatlar.","ingredients":["Çeşitli meşrubatlar"]},
 "milkshake":{"desc":"Yoğun sütlü ve kremalı.","ingredients":["Süt","Dondurma","Şurup"]},
 "meyveli-soda":{"desc":"Meyve aromalı hafif gazlı.","ingredients":["Soda","Meyve aroması"]},
+//морожка
 "icecream-vanilya":{"desc":"Klasik vanilya lezzeti.","ingredients":["Süt","Şeker","Vanilya"]},
 "icecream-visne":{"desc":"Hafif ekşi vişne tadı.","ingredients":["Süt","Şeker","Vişne"]},
 "icecream-cikolata":{"desc":"Zengin çikolata tadı.","ingredients":["Süt","Şeker","Kakao"]},
@@ -826,11 +832,31 @@ const AMOUR_ENRICH = {
 "icecream-cilek":{"desc":"Taze çilek aroması.","ingredients":["Süt","Şeker","Çilek"]},
 "icecream-parca-cikolata":{"desc":"Çikolata parçacıklı keyif.","ingredients":["Süt","Şeker","Çikolata parçaları"]},
 "icecream-krokan":{"desc":"Kıtır krokan parçalarlı.","ingredients":["Süt","Şeker","Krokan"]},
+//екстра
 "extra-shot":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
 "extra-syrup":{"desc":"Favori şurubunu ekle.","ingredients":["Şurup"]},
 "extra-milk":{"desc":"Süt tercihini seç.","ingredients":["Süt"]},
 "extra-honey":{"desc":"Doğal bal dokunuşu.","ingredients":["Bal"]},
 "powerbank":{"desc":"30 dk şarj hizmeti.","ingredients":["Hizmet"]},
+// BİTKİ ÇAYLARI
+"herbal-0":{"desc":"Bir shot espresso ekleme.","ingredients":["Ihlamur"]},
+"herbal-1":{"desc":"Bir shot espresso ekleme.","ingredients":["Kış Çayı"]},
+"herbal-2":{"desc":"Bir shot espresso ekleme.","ingredients":["Yeşil Çay"]},
+"herbal-3":{"desc":"Bir shot espresso ekleme.","ingredients":["Ada Çayı"]},
+"herbal-4":{"desc":"Bir shot espresso ekleme.","ingredients":["Papatya"]},
+"herbal-5":{"desc":"Bir shot espresso ekleme.","ingredients":["Kuşburnu Çayı"]},
+ // KOKTEYLLER
+"amour-milano":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+"amour-special":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+"amour-melo":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+"amour-wild-berry":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+"amour-vibe":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+"amour-sky":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+"amour-lime":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+"amour-mango-portakal":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+"amour-hibiscus":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+"amour-dark":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+//сладкое
 "magnolia":{"desc":"İpeksi кремalı tatlı.","ingredients":["Süt","Krema","Meyve/kurabiye"]},
 "profiterol":{"desc":"Çikolata soslu mini toplar.","ingredients":["Hamur topları","Krema","Çikolata"]},
 "san-sebastian":{"desc":"Kıvamlı cheesecake dokusu.","ingredients":["Krem peynir","Yumurta","Şeker"]},
