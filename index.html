@@ -21,6 +21,7 @@
           }
         }
       }
+//test
     </script>
     <style>
       body { background:#0b0b0b; color:#fff; }
@@ -94,28 +95,170 @@
 
       /* zoom для модалки */
       @keyframes zoom { from { transform: scale(.85); opacity:.3; } to { transform: scale(1); opacity:1; } }
+        /* RTL mode adjustments */
+        body.rtl * {
+          direction: rtl !important;
+          text-align: right !important;
+        }
+
+        body.rtl .flex {
+          flex-direction: row-reverse;
+        }
+
+        body.rtl .modal-content {
+          text-align: right;
+        }
+
+        body.rtl button {
+          text-align: right;
+        }
+
     </style>
   </head>
-  <body class="font-sans">
-    <div id="root"></div>
+  
 
-    <!-- ===== APP SCRIPT (рендер + модалка) ===== -->
-    <script>
-      const CATS = {
-        hot:{ key:"hot", title:"SICAK İÇECEKLER" },
-        herbal:{ key:"herbal", title:"BİTKİ ÇAYLARI" },
-        cocktails:{ key:"cocktails", title:"KOKTEYLLER" },
-        cold:{ key:"cold", title:"SOĞUK İÇECEKLER" },
-        icecream:{ key:"icecream", title:"DONDURMA" },
-        coffees:{ key:"coffees", title:"KAHVELER" },
-        filter:{ key:"filter", title:"FİLTRE KAHVELER" },
-        iced:{ key:"iced", title:"SOĞUK KAHVELER" },
-        extras:{ key:"extras", title:"EKSTRALAR" },
-        desserts:{ key:"desserts", title:"TATLILAR"},
-      };
+<body class="font-sans">
 
-      /* MENU — id/цены/картинки сохранены, для КОФЕ добавлены: desc, ingredients, caffeine */
-      const MENU = [ 
+<div id="root"></div>
+    <!-- ===== Footer ===== -->
+    <footer class="border-t border-white/10 text-center text-sm text-white/60 py-6">
+      <div class="space-y-1">
+        <p>(!) Görseldeki ürün gerçeğinden farklılık gösterebilir</p>
+        <p>© 2025 Amour Coffee — instagram <a href="https://www.instagram.com/amour_coffee77" target="_blank" class="hover:text-white">@amour_coffee77</a></p>
+        <p>Site yapıldı <a href="https://www.instagram.com/dima_b0nd/" target="_blank" class="font-semibold hover:text-white">Dmitrii Bondarev</a></p>
+      </div>
+    </footer>
+
+<!-- 🌍 Language Selector Modal -->
+<div id="lang-modal" class="fixed inset-0 bg-black/90 flex flex-col items-center justify-center text-white z-50 text-center px-4 hidden">
+  <div class="max-w-md w-full">
+    <h2 class="text-2xl font-semibold mb-8 tracking-wide uppercase text-gray-100">
+      🌐 Select Your Language
+    </h2>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+      <button data-lang="tr" class="lang-btn">🇹🇷 Türkçe</button>
+      <button data-lang="en" class="lang-btn">🇬🇧 English</button>
+      <button data-lang="ru" class="lang-btn">🇷🇺 Русский</button>
+      <button data-lang="ar" class="lang-btn">🇸🇦 العربية</button>
+      <button data-lang="fa" class="lang-btn">🇮🇷 فارسی</button>
+      <button data-lang="fr" class="lang-btn">🇫🇷 Français</button>
+    </div>
+
+    <p class="mt-8 text-sm text-gray-400 italic">Amour Café — Yalova</p>
+  </div>
+</div>
+<!-- 💅 Styling for language buttons -->
+<style>
+  .lang-btn {
+    @apply px-6 py-3 bg-white text-black font-medium rounded-lg shadow-sm transition-transform duration-200 hover:scale-105 hover:bg-gray-200 active:scale-95;
+  }
+</style>
+<script>
+    const langModal = document.getElementById("lang-modal");
+    window.translations = {};
+    window.currentLang = localStorage.getItem("lang") || null;
+
+    // ✅ Загружаем JSON
+    async function loadTranslations(lang) {
+      try {
+        const res = await fetch(`./lang/lang-${lang}.json`);
+        window.translations = await res.json();
+      } catch (e) {
+        console.warn("❗ JSON языка не найден:", lang);
+        window.translations = {};
+      }
+    }
+
+    // ✅ Установка языка
+    async function setLanguage(lang) {
+      window.currentLang = lang;
+      localStorage.setItem("lang", lang);
+            // ✅ RTL поддержка
+      if (lang === "ar" || lang === "fa") {
+        document.documentElement.setAttribute("dir", "rtl");
+      } else {
+        document.documentElement.setAttribute("dir", "ltr");
+      }
+
+      await loadTranslations(lang);
+
+      langModal.classList.add("hidden");
+
+      applyLanguage();
+      render(); // ⚡ перерисовываем UI
+    }
+
+    // ✅ Применение переводов к MENU
+    function applyLanguage() {
+      MENU.forEach(item => {
+        const trItem = window.translations.menu?.[item.id];
+        if (!trItem) return;
+
+        // ✅ Название
+        if (trItem.name) {
+          item.name = {
+            ...item.name,
+            [window.currentLang]: trItem.name // динамично записываем перевод
+          };
+        }
+
+        // ✅ Описание
+        if (trItem.desc) item.desc = trItem.desc;
+
+        // ✅ Ингредиенты
+        if (trItem.ingredients) item.ingredients = trItem.ingredients;
+      });
+    }
+
+
+    // ✅ Обработчики кнопок выбора языка (СТОЯТ ОТДЕЛЬНО!)
+    document.querySelectorAll(".lang-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const lang = btn.dataset.lang;
+        if (!lang) return;
+        setLanguage(lang);
+      });
+    });
+</script>
+
+
+
+<!-- ✅ drink modal -->
+<div id="drinkModal" class="fixed inset-0 z-[9999] hidden bg-black/70 backdrop-blur-sm flex items-center justify-center">
+  <div class="bg-[#111] text-white p-5 rounded-2xl max-w-xs w-full relative animate-[zoom_.25s_ease]">
+    <button id="modalClose" class="absolute top-2 right-2 text-xl text-white/70 hover:text-white">×</button>
+    <img id="modalImg" class="w-full rounded-xl mb-4" />
+    <h3 id="modalName" class="text-xl font-semibold mb-2"></h3>
+    <div id="modalDescUI" class="flex flex-wrap gap-2 text-xs mb-3"></div>
+      <h4 id="modalIngTitle" class="text-sm font-semibold mb-1">Ingredients</h4>
+      <ul id="modalIng" class="text-xs space-y-1 mb-3"></ul>
+    <h4 id="cafTitle" class="text-sm font-semibold mb-1 hidden">Kafein</h4>
+    <div id="cafDots" class="flex gap-1 mb-1 hidden"></div>
+    <div id="cafMg" class="text-xs text-white/60 mb-2 hidden"></div>
+  </div>
+</div>
+
+<script>
+/* ----------------------------------------------
+   ✅ Data (MENU + ENRICH stays as is)
+---------------------------------------------- */
+const CATS = {
+  hot: "SICAK İÇECEKLER",
+  herbal: "BİTKİ ÇAYLARI",
+  cocktails: "KOKTEYLLER",
+  cold: "SOĞUK İÇECEKLER",
+  icecream: "DONDURMA",
+  coffees: "KAHVELER",
+  filter: "FİLTRE KAHVELER",
+  iced: "SOĞUK KAHVELER",
+  extras: "EKSTRALAR",
+  desserts: "TATLILAR"
+};
+
+
+
+const MENU = [ 
         // SICAK
         { id:"cay", cat:"hot", name:"Çay", price:50, img:"images/cay.webp" },
         { id:"fincan-cay", cat:"hot", name:"Fincan Çay", price:80, img:"images/fincan-cay.webp" },
@@ -293,602 +436,343 @@
         { id:"lotus-cheesecake", cat:"desserts", name:"Lotus Cheesecake", price:220, img:"images/lotus-cheesecake.webp" },
         { id:"mini-cookies", cat:"desserts", name:"Atıştırmalık Kurabiye Çeşitleri", price:70, img:"images/mini-cookies.webp" },
       ];
-
-      const fmt = n => new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY',maximumFractionDigits:0}).format(n);
-      const root = document.getElementById('root');
-
-      function h(tag, props={}, ...children){
-        const el = document.createElement(tag);
-        Object.entries(props||{}).forEach(([k,v])=>{
-          if (k==='class') el.className=v;
-          else if (k==='src') el.src=v;
-          else if (k==='dataset' && v && typeof v==='object') {
-            Object.entries(v).forEach(([dk,dv]) => el.dataset[dk] = dv);
-          }
-          else if (v!=null) el.setAttribute(k,v);
-        });
-        children.flat().forEach(c => el.appendChild(typeof c==='string' ? document.createTextNode(c) : c));
-        return el;
-      }
-
-      let active='hot';
-
-      function setActive(k){ active=k; render(); window.scrollTo({top:0,behavior:'smooth'}); }
-
-      /* ===== РЕНДЕР ===== */
-      function render() {
-        root.innerHTML = '';
-
-        // Header
-        const header = h('div', { class:'sticky top-0 z-30 bg-black border-b border-white/10 shadow-sm' },
-          h('div', { class:'max-w-6xl mx-auto h-24 px-6 flex items-center justify-between' },
-            h('img', { src:'images/logo-segafredo.png', class:'h-12 w-auto opacity-90' }),
-            h('img', { src:'images/logo.png', class:'h-20 md:h-24 w-auto mx-auto opacity-100' }),
-            h('img', { src:'images/logo-alpedo.png', class:'h-14 w-auto opacity-90' })
-          )
-        );
-
-        let layout;
-
-        // MOBILE
-        if (window.innerWidth <= 768) {
-          layout = h('div', { class:'flex' },
-
-            // Left menu
-            h('div', { id:'mobile-menu', class:'flex flex-col gap-2 p-2 w-[110px] sticky top-24 h-screen overflow-y-auto border-r border-white/10' },
-              ...Object.values(CATS).map(c =>
-                h('button', {
-                  class:'text-[12px] px-2 py-2 rounded-lg border ' + 
-                  (active===c.key ? 'bg-white text-black' : 'bg-neutral-900 text-white hover:bg-white/10'),
-                  onclick:()=>setActive(c.key)
-                }, c.title)
-              )
-            ),
-
-            // Content
-            h('div', { class:'flex-1 p-2 overflow-y-auto' },
-              h('div', { class:'grid grid-cols-2 gap-2' },
-                ...MENU.filter(m=>m.cat===active).map(item =>
-                  h('article', { class:'card overflow-hidden reveal', dataset:{ id:item.id } },
-                    h('img', { class:'img', src:item.img, dataset:{ id:item.id } }),
-                    h('div', { class:'p-2 text-xs flex justify-between' },
-                      h('span',{}, window.translations?.[window.currentLang]?.[item.id] || item.name),
-                      h('span',{}, typeof item.price==='number'
-            ? fmt(item.price)
-            : item.price && item.price.S
-              ? `S ${fmt(item.price.S)} / M ${fmt(item.price.M)}`
-              : item.sizes && item.sizes.S
-                ? `S ${fmt(item.sizes.S)} / M ${fmt(item.sizes.M)}`
-                : '')
-                    )
-                  )
-                )
-              )
-            )
-          );
-        }
-
-        // DESKTOP
-        else {
-          layout = h('div', { class:'max-w-6xl mx-auto grid grid-cols-12 gap-4 px-4 pt-4 pb-24' },
-
-            // Sidebar
-            h('aside', { class:'col-span-3' },
-              h('div', { class:'sticky top-36 space-y-1' },
-                ...Object.values(CATS).map(c =>
-                  h('button', {
-                    class:'w-full text-left px-3 py-2 rounded-lg border ' + 
-                    (active===c.key ? 'bg-white text-black' : 'bg-transparent text-white hover:bg-white/10'),
-                    onclick:()=>setActive(c.key)
-                  }, c.title)
-                )
-              )
-            ),
-
-            // Grid
-            h('div', { class:'col-span-9' },
-              h('div', { class:'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' },
-                ...MENU.filter(m=>m.cat===active).map(item =>
-                  h('article', { class:'card overflow-hidden reveal', dataset:{ id:item.id } },
-                    h('img', { class:'img', src:item.img, dataset:{ id:item.id } }),
-                    h('div', { class:'p-3 flex justify-between' },
-                      h('span',{}, window.translations?.[window.currentLang]?.[item.id] || item.name),
-                      h('span',{}, typeof item.price==='number'
-            ? fmt(item.price)
-            : item.price && item.price.S
-              ? `S ${fmt(item.price.S)} / M ${fmt(item.price.M)}`
-              : item.sizes && item.sizes.S
-                ? `S ${fmt(item.sizes.S)} / M ${fmt(item.sizes.M)}`
-                : '')
-                    )
-                  )
-                )
-              )
-            )
-          );
-        }
-
-        root.appendChild(header);
-        root.appendChild(layout);
-        initReveals();
-        initModalListeners();
-      }
-
-      /* ===== Reveal ===== */
-      let revealObserver;
-      function initReveals() {
-        if (revealObserver) revealObserver.disconnect();
-
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
-          return;
-        }
-
-        revealObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('in');
-              revealObserver.unobserve(entry.target);
-            }
-          });
-        }, { root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.15 });
-
-        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-      }
-
-      // Делегирование кликов по категориям (страховка)
-      document.addEventListener('click', e => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
-        const cat = Object.values(CATS).find(c => c.title === btn.textContent);
-        if (cat) setActive(cat.key);
-      });
-
-      /* ===== MODAL LOGIC — здесь, чтобы быть доступным до первого render() ===== */
-      function initModalListeners() {
-        document.querySelectorAll('article.card img').forEach(img => {
-          img.style.cursor = "pointer";
-          img.onclick = () => openModal(img);
-        });
-      }
-
-      
-      function openModal(imgEl) {
-        const id = imgEl.dataset.id || imgEl.closest('article')?.dataset?.id;
-        const item = MENU.find(x => x.id === id) || {};
-        const trName = (window.translations?.[window.currentLang]?.[id]) || item.name || 'Ürün';
-
-       // ingredients (MENU priority → ENRICH → empty)
-		const enrich = (typeof AMOUR_ENRICH !== 'undefined' && AMOUR_ENRICH[id]) ? AMOUR_ENRICH[id] : {};
-		const ingredients = enrich.ingredients || item.ingredients || [];
-
-		document.getElementById("modalImg").src = item.img || imgEl.src;
-		document.getElementById("modalName").textContent = trName;
-
-		// flavor chips from desc
-		const desc = enrich.desc || item.desc || "";
-		const descUI = document.getElementById("modalDescUI");
-
-
-		if (desc && desc.trim().length) {
-		  const parts = desc.split(/[,./]/).map(d => d.trim()).filter(Boolean);
-
-		  descUI.innerHTML = parts.map(d =>
-			`<span class="px-2 py-1 bg-white/10 rounded-full border border-white/20">${d}</span>`
-		  ).join("");
-
-		  descUI.style.display = "flex";
-		} else {
-		  descUI.style.display = "none";
-		}
-
-        const ingList = document.getElementById("modalIng");
-        ingList.innerHTML = ingredients.length ? ingredients.map(i=>`<li>${i}</li>`).join("") : '<li>Bilgi yakında</li>';
-		
-		    // caffeine (MENU priority → ENRICH → null)
-		let caffeine = null;
-		if (typeof enrich.caffeine === "number") {
-		  caffeine = enrich.caffeine;
-		} else if (typeof item.caffeine === "number") {
-		  caffeine = item.caffeine;
-		}
-
-
-		const caffeineTitle = document.getElementById('caffeineTitle');
-		const dotsWrap = document.getElementById('caffeineDots');
-		const mgEl = document.getElementById('caffeineMg');
-
-		const caffeineCats = ['coffees', 'filter', 'iced'];
-		const showCat = caffeineCats.includes(item.cat);
-
-		if (showCat && caffeine !== null) {
-		  caffeineTitle.style.display = "block";
-		  dotsWrap.style.display = "flex";
-		  mgEl.style.display = "block";
-
-		  const dots = Math.min(5, Math.max(1, Math.ceil(caffeine / 50)));
-		  dotsWrap.innerHTML = "";
-		  for (let i = 0; i < 5; i++) {
-			dotsWrap.innerHTML += `
-			  <span style="
-				width:8px;height:8px;margin-right:4px;
-				border-radius:50%;
-				border:1px solid #fff;
-				display:inline-block;
-				background:${i < dots ? '#fff' : 'transparent'}"></span>`;
-		  }
-		  mgEl.textContent = caffeine + " mg";
-		} else {
-		  caffeineTitle.style.display = "none";
-		  dotsWrap.style.display = "none";
-		  mgEl.style.display = "none";
-		}
-
-
-        const modal = document.getElementById("drinkModal");
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-      }
-
-      function closeModal() {
-        const modal = document.getElementById("drinkModal");
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-      }
-
-      // закрытия
-      document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
-
-      // первый рендер (пока без языка — язык ниже)
-      render();
-    </script>
-
-    <!-- ===== Footer ===== -->
-    <footer class="border-t border-white/10 text-center text-sm text-white/60 py-6">
-      <div class="space-y-1">
-        <p>(!) Görseldeki ürün gerçeğinden farklılık gösterebilir</p>
-        <p>© 2025 Amour Coffee — instagram <a href="https://www.instagram.com/amour_coffee77" target="_blank" class="hover:text-white">@amour_coffee77</a></p>
-        <p>Site yapıldı <a href="https://www.instagram.com/dima_b0nd/" target="_blank" class="font-semibold hover:text-white">Dmitrii Bondarev</a></p>
-      </div>
-    </footer>
-
-    <!-- 🌍 Language Selector Modal -->
-    <div id="lang-modal" class="fixed inset-0 bg-black/90 flex flex-col items-center justify-center text-white z-50 text-center px-4">
-      <div class="max-w-md w-full">
-        <h2 class="text-2xl font-semibold mb-8 tracking-wide uppercase text-gray-100">🌐 Select Your Language</h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <button id="lang-tr" class="lang-btn">🇹🇷 Türkçe</button>
-          <button id="lang-en" class="lang-btn">🇬🇧 English</button>
-          <button id="lang-ru" class="lang-btn">🇷🇺 Русский</button>
-          <button id="lang-ar" class="lang-btn">🇸🇦 العربية</button>
-          <button id="lang-fa" class="lang-btn">🇮🇷 فارسی</button>
-          <button id="lang-fr" class="lang-btn">🇫🇷 Français</button>
-        </div>
-        <p class="mt-8 text-sm text-gray-400 italic">Amour Café — Yalova</p>
-      </div>
-    </div>
-
-    <!-- 💅 Styling for language buttons -->
-    <style>
-      .lang-btn { @apply px-6 py-3 bg-white text-black font-medium rounded-lg shadow-sm transition-transform duration-200 hover:scale-105 hover:bg-gray-200 active:scale-95; }
-    </style>
-
-    <!-- ===== LANG + MODAL close bindings ===== -->
-    <script>
-      const LANG_KEY = 'amour_lang';
-      window.translations = {
-        /* … ТВОИ ПОЛНЫЕ ПЕРЕВОДЫ ИЗ ПРОШЛОГО ФАЙЛА (оставил без изменений) … */
-        /* Чтобы не раздувать ответ, оставь тут ровно твой объект translations как у тебя был */
-      };
-      window.currentLang = localStorage.getItem(LANG_KEY) || 'tr';
-      const langModal = document.getElementById('lang-modal');
-
-      function setLanguage(lang) {
-        window.currentLang = lang;
-        localStorage.setItem(LANG_KEY, lang);
-        langModal.style.display = 'none';
-        applyLanguage(lang);
-      }
-
-      function applyLanguage(lang) {
-        document.body.dir = (lang === 'ar' || lang === 'fa') ? 'rtl' : 'ltr';
-
-        if (lang === 'en') {
-          document.title = "Amour — Menu";
-          document.querySelector('meta[name="description"]').setAttribute('content', 'Amour Café — Yalova. Black & white minimalist menu.');
-          CATS.hot.title = "HOT DRINKS";
-          CATS.herbal.title = "HERBAL TEAS";
-          CATS.cocktails.title = "COCKTAILS";
-          CATS.cold.title = "COLD DRINKS";
-          CATS.icecream.title = "ICE CREAMS";
-          CATS.coffees.title = "COFFEES";
-          CATS.filter.title = "FILTER COFFEES";
-          CATS.iced.title = "ICED COFFEES";
-          CATS.extras.title = "EXTRAS";
-          CATS.desserts.title = "DESSERTS";
-        } else if (lang === 'tr') {
-          document.title = "Amour — Menü";
-          document.querySelector('meta[name="description"]').setAttribute('content', 'Amour Café — Yalova. Siyah-beyaz minimalist menü.');
-          CATS.hot.title = "SICAK İÇECEKLER";
-          CATS.herbal.title = "BİTKİ ÇAYLARI";
-          CATS.cocktails.title = "KOKTEYLLER";
-          CATS.cold.title = "SOĞUK İÇECEKLER";
-          CATS.icecream.title = "DONDURMA";
-          CATS.coffees.title = "KAHVELER";
-          CATS.filter.title = "FİLTRE KAHVELER";
-          CATS.iced.title = "SOĞUK KAHVELER";
-          CATS.extras.title = "EKSTRALAR";
-          CATS.desserts.title = "TATLILAR";
-        } else if (lang === 'ru') {
-          document.title = "Amour — Меню";
-          document.querySelector('meta[name="description"]').setAttribute('content', 'Amour Café — Ялова. Минималистичное чёрно-белое меню.');
-          CATS.hot.title = "ГОРЯЧИЕ НАПИТКИ";
-          CATS.herbal.title = "ТРАВЯНЫЕ ЧАИ";
-          CATS.cocktails.title = "КОКТЕЙЛИ";
-          CATS.cold.title = "ХОЛОДНЫЕ НАПИТКИ";
-          CATS.icecream.title = "МОРОЖЕНОЕ";
-          CATS.coffees.title = "КОФЕ";
-          CATS.filter.title = "ФИЛЬТР-КОФЕ";
-          CATS.iced.title = "АЙС КОФЕ";
-          CATS.extras.title = "ЭКСТРА И ЗАРЯДКА";
-          CATS.desserts.title = "ДЕСЕРТЫ";
-        } else if (lang === 'ar') {
-          document.title = "قائمة آمور";
-          document.querySelector('meta[name="description"]').setAttribute('content', 'مقهى آمور — يالوفا. قائمة أنيقة بالأبيض والأسود.');
-          CATS.hot.title = "المشروبات الساخنة";
-          CATS.herbal.title = "شاي الأعشاب";
-          CATS.cocktails.title = "كوكتيلات";
-          CATS.cold.title = "المشروبات الباردة";
-          CATS.icecream.title = "الآيس كريم";
-          CATS.coffees.title = "القهوة";
-          CATS.filter.title = "القهوة المفلترة";
-          CATS.iced.title = "القهوة المثلجة";
-          CATS.extras.title = "الإضافات";
-          CATS.desserts.title = "الحلويات";
-        } else if (lang === 'fa') {
-          document.title = "منوی آمور";
-          document.querySelector('meta[name="description"]').setAttribute('content', 'کافه آمور — یالووا. منوی سیاه و سفید مینیمال.');
-          CATS.hot.title = "نوشیدنی‌های گرم";
-          CATS.herbal.title = "دمنوش‌های گیاهی";
-          CATS.cocktails.title = "کوکتل‌ها";
-          CATS.cold.title = "نوشیدنی‌های سرد";
-          CATS.icecream.title = "بستنی‌ها";
-          CATS.coffees.title = "قهوه‌ها";
-          CATS.filter.title = "قهوه‌های فیلتری";
-          CATS.iced.title = "قهوه‌های یخ‌دار";
-          CATS.extras.title = "افزودنی‌ها";
-          CATS.desserts.title = "دسرها";
-        } else if (lang === 'fr') {
-          document.title = "Amour — Menu";
-          document.querySelector('meta[name="description"]').setAttribute('content', 'Amour Café — Yalova. Menu minimaliste noir et blanc.');
-          CATS.hot.title = "BOISSONS CHAUDES";
-          CATS.herbal.title = "INFUSIONS";
-          CATS.cocktails.title = "COCKTAILS";
-          CATS.cold.title = "BOISSONS FROIDES";
-          CATS.icecream.title = "GLACES";
-          CATS.coffees.title = "CAFÉS";
-          CATS.filter.title = "CAFÉS FILTRÉS";
-          CATS.iced.title = "CAFÉS GLACÉS";
-          CATS.extras.title = "SUPPLÉMENTS";
-          CATS.desserts.title = "DESSERTS";
-        }
-
-        // перерисовать с новыми заголовками
-        render();
-      }
-
-      // кнопки выбора языка
-      document.getElementById('lang-tr').onclick = () => setLanguage('tr');
-      document.getElementById('lang-en').onclick = () => setLanguage('en');
-      document.getElementById('lang-ru').onclick = () => setLanguage('ru');
-      document.getElementById('lang-ar').onclick = () => setLanguage('ar');
-      document.getElementById('lang-fa').onclick = () => setLanguage('fa');
-      document.getElementById('lang-fr').onclick = () => setLanguage('fr');
-
-      // показать выбор языка при входе (как раньше)
-      langModal.style.display = 'flex';
-
-      // привязка X/фон — в этом скрипте (чтобы было после HTML модалки)
-      document.getElementById("modalClose").onclick = () => closeModal();
-      document.getElementById("drinkModal").addEventListener("click", e => { if (e.target === e.currentTarget) closeModal(); });
-
-      // старт с выбранным ранее языком (если пользователь уже выбирал)
-      // (без всплытия окна языка можно сделать: applyLanguage(currentLang))
-      // но сейчас мы оставили показ модалки языка как у тебя было.
-    </script>
-
-    <!-- ✅ Product Modal (внутри body, перед </body>) -->
-	<!-- ✅ Product Modal (внутри body, перед </body>) -->
-	<div id="drinkModal" class="fixed inset-0 z-[9999] hidden bg-black/70 backdrop-blur-sm items-center justify-center">
-	  <div class="bg-[#111] text-white p-5 rounded-2xl max-w-xs w-full relative animate-[zoom_.25s_ease]">
-		<button id="modalClose" class="absolute top-2 right-2 text-xl text-white/70 hover:text-white">×</button>
-
-		<img id="modalImg" src="" class="w-full rounded-xl mb-4"/>
-
-		<h3 id="modalName" class="text-xl font-semibold mb-2"></h3>
-
-		<!-- ✅ Chips block for flavors -->
-		<div id="modalDescUI" class="flex flex-wrap gap-2 text-xs text-white/80 mb-3"></div>
-
-		<!-- (old desc remains hidden just in case) -->
-		<p id="modalDesc" style="display:none"></p>
-
-		<h4 class="text-sm font-semibold mb-1">İçindekiler</h4>
-		<ul id="modalIng" class="text-xs text-white/80 mb-4 space-y-1"></ul>
-
-		<!-- Caffeine -->
-		<h4 id="caffeineTitle" class="text-sm font-semibold mb-1">Kafein</h4>
-		<div id="caffeineWrap">
-		  <div id="caffeineDots" class="flex gap-1 mb-1"></div>
-		  <div id="caffeineMg" class="text-xs text-white/60 mb-2"></div>
-		</div>
-	  </div>
-	</div>
-
-	<script>
-	  const modal = document.getElementById("drinkModal");
-	  const closeBtn = document.getElementById("modalClose");
-
-	  // Закрыть по крестику
-	  closeBtn.addEventListener("click", () => {
-		modal.classList.add("hidden");
-		modal.classList.remove("flex");
-	  });
-
-	  // Закрыть по фону
-	  modal.addEventListener("click", (e) => {
-		if (e.target === modal) {
-		  modal.classList.add("hidden");
-		  modal.classList.remove("flex");
-		}
-	  });
-
-		// ESC уже работает
-	</script>
-    <!-- ✅ конец модалки -->
-  
+const AMOUR_ENRICH = {
+		//КОФЕ СДЕЛАЛ
+		"espresso":{"desc":"Yoğun aromalı güçlü ve konsantre kahve","ingredients":["Espresso"],"caffeine":63},
+		"espresso-macchiato":{"desc":"Az miktarda süt köpüğü ile servis edilen yoğun ve karakterli espresso","ingredients":["Espresso","Süt köpüğü"],"caffeine":63},
+		"americano":{"desc":"Espresso bazlı sıcak su ile hazırlanmış yumuşak siyah kahve.","ingredients":["Espresso","Sıcak su"],"caffeine":95},
+		"latte":{"desc":"Bol sütlü yumuşak içimli nazik kahve içeceği.","ingredients":["Espresso","Süt","Süt köpüğü"],"caffeine":80},
+		"white-mocha":{"desc":"Beyaz çikolata ve süt ile hazırlanmış tatlı ve kremamsı kahve.","ingredients":["Espresso","Süt","Beyaz çikolata sosu"],"caffeine":90},
+		"mocha":{"desc":"Çikolata ve süt ile hazırlanan, yoğun ve tatlı kahve.","ingredients":["Espresso","Süt","Çikolata sosu"],"caffeine":90},
+		"caramel-latte":{"desc":"Vanilya-karamel tatlılığına sahip yumuşak ve kremamsı latte.","ingredients":["Espresso","Süt","Karamel sosu"],"caffeine":80},
+		"cappuccino":{"desc":"Yoğun köpüklü süt ile hazırlanmış dengeli lezzette kahve.","ingredients":["Espresso","Süt","Süt köpüğü"],"caffeine":75},
+		"cortado":{"desc":"Az sütle hazırlanan yoğun ve yumuşak içimli espresso.","ingredients":["Espresso","Az süt"],"caffeine":75},
+		"flat-white":{"desc":"Kadifemsi süt dokusuyla güçlü kahve aroması.","ingredients":["Çift espresso","Süt"],"caffeine":126},
+		"latte-macchiato":{"desc":"Sütün üzerine eklenen espresso dokunuşu hafif ve sütlü tat.","ingredients":["Espresso","Süt","Süt köpüğü"],"caffeine":75},
+		"nutellatte":{"desc":"Nutella ile hazırlanan çikolatalı-fındıklı tatlı ve kremamsı latte.","ingredients":["Espresso","Süt","Fındık-kakao kreması"],"caffeine":80},
+		"deca-cream":{"desc":"Süt bazlı, kafeinsiz kremamsı içecek.","ingredients":["Kafeinsiz espresso"],"caffeine":6},
+		"turk-kahvesi":{"desc":"İnce çekilmiş kahvenin geleneksel yöntemle hazırlanmış aromatik hali.","ingredients":["Türk kahvesi","Su"],"caffeine":60},
+		"double-turk":{"desc":"Çift porsiyon Türk kahvesi güçlü ve yoğun lezzet.","ingredients":["Türk kahvesi (duble)","Su"],"caffeine":120},
+		"dibek":{"desc":"Havanda dövülmüş yumuşak ve kremamsı kıvamda zengin aromalı kahve.","ingredients":["Dibek kahvesi","Su"],"caffeine":60},
+		"menengic":{"desc":"Doğal ve kafeinsiz fındıksı aromalı ve yumuşak dokulu içecek.","ingredients":["Menengiç","Süt veya su"]},
+		//фильтркофе СДЕЛАЛ
+		"kenya":{"desc":"Meyvemsi notalar ve parlak asiditeye sahip filtre kahve","ingredients":["Filtre kahve","Su"],"caffeine":120},
+		"colombia":{"desc":"Yumuşak asidite karamel ve fındık notalarına sahip filtre kahve","ingredients":["Filtre kahve","Su"],"caffeine":115},
+		"ethiopia":{"desc":"Narenciye ve çiçek notalarına sahip hafif ve aromatik filtre kahve","ingredients":["Filtre kahve","Su"],"caffeine":120},
+		"costarica":{"desc":"Karamel ve narenciye notalarıyla dengeli ve parlak bir tat","ingredients":["Filtre kahve","Su"],"caffeine":115},
+		"guatemala":{"desc":"Çikolata notaları ve hafif meyvemsi tatlılığa sahip zengin bir lezzet","ingredients":["Filtre kahve","Su"],"caffeine":115},
+		"v60":{"desc":"El demleme yöntemiyle hazırlanan filtre kahve temiz ve parlak tat (V60)","ingredients":["Öğütülmüş kahve","Su"],"caffeine":120},
+		"chemex":{"desc":"Chemex yöntemiyle hazırlanmış temiz ve yumuşak hafif tatlılık sunan kahve","ingredients":["Öğütülmüş kahvе","Su"],"caffeine":120},
+		//кофе холодное
+		"iced-americano":{"desc":"Buzlu ferah ve net kahve tadı.","ingredients":["Espresso","Su","Buz"],"caffeine":95},
+		"iced-latte":{"desc":"Soğuk sütle yumuşak kahve.","ingredients":["Espresso","Süt","Buz"],"caffeine":80},
+		"iced-mocha":{"desc":"Çikolatalı buzlu latte.","ingredients":["Espresso","Süt","Çikolata","Buz"],"caffeine":90},
+		"iced-caramel-latte":{"desc":"Karamel dokunuşlu buzlu latte.","ingredients":["Espresso","Süt","Karamel","Buz"],"caffeine":80},
+		"iced-white-mocha":{"desc":"Beyaz çikolatalı buzlu latte.","ingredients":["Espresso","Süt","Beyaz çikolata","Buz"],"caffeine":90},
+		"cold-brew":{"desc":"Uzun demleme yumuşak ve güçlü.","ingredients":["Öğütülmüş kahве","Su","Buz"],"caffeine":150},
+		"frappe":{"desc":"Çilek,Çikolata, Vanilya, Karamel","ingredients":["Kahve","Süt veya su","Buz"],"caffeine":80},
+		"italian-frappe":{"desc":"Klasik İtalyan tarzı frappe.","ingredients":["Kahве","Süt veya su","Buz"],"caffeine":85},
+		"greek-frappe":{"desc":"Yunan tarzı hafif köpüklü.","ingredients":["Çözünebilir kahве","Su","Buz"],"caffeine":75},
+		"ice-nutellatte":{"desc":"Fındık-kakaolu buzlu latte.","ingredients":["Espresso","Süt","Fındık-kakao kreması","Buz"],"caffeine":80},
+		"ice-chai-latte":{"desc":"Baharatlı sütlü ve ferah.","ingredients":["Çay","Süt","Baharat","Buz"]},
+		"affogato":{"desc":"Dondurma üstüne sıcak espresso.","ingredients":["Espresso","Dondurma"],"caffeine":63},
+		//Горячие напитки СДЕЛАЛ
+		"cay":{"desc":"Geleneksel ve taze demlenmiş siyah çay.","ingredients":["Siyah çay","Su"]},
+		"fincan-cay":{"desc":"Bardakta geleneksel çay","ingredients":["Siyah çay","Su"]},
+		"takeaway-cay":{"desc":"Kağıt bardakta çay","ingredients":["Siyah çay","Su"]},
+		"salep":{"desc":"Tarçın ve sütlü sıcak içecek","ingredients":["Salep","Süt","Tarçın","Şeker"]},
+		"sicak-cikolata":{"desc":"Sıcak ve yoğun kakaolu çikolatalı içecek","ingredients":["Kakao","Süt","Şeker"]},
+		"beyaz-sicak-cikolata":{"desc":"Yoğun ve sıcak beyaz çikolatalı içecek.","ingredients":["Beyaz çikolata","Süt"]},
+		"chai-latte":{"desc":"Baharatlı sütlü çay içeceği","ingredients":["Çay","Süt","Chai baharatı"]},
+		"balli-sut":{"desc":"Bal ile tatlandırılmış sıcak süt","ingredients":["Süt","Bal"]},
+		//холодные напитки РЕДИ
+		"su":{"ingredients":["Su"]},
+		"soda":{"desc":"Ferahlatıcı gazlı mineral içeceği","ingredients":["Soda"]},
+		"sikma-portakal":{"desc":"Taze sıkılmış doğal ve ferahlatıcı portakal suyu.","ingredients":["Portakal"]},
+		"frozen":{"desc":"Mango, Çilek, Seftali, Yaban Mersini, Frambuaz, Orman Meyveli","ingredients":["Meyve püresi","Buz"]},
+		"italian-soda":{"desc":"Meyveli şurup ile hazırlanan hafif gazlı ferah ve aromatik içecek.","ingredients":["Soda","Meyve şurubu","Buz"]},
+		"limonata":{"desc":"Taze narenciye aromalı ev yapımı limonata.","ingredients":["Limon","Şeker","Su","Buz"]},
+		"aromali-limonata":{"desc":"Çilek, Nar , Nane.","ingredients":["Limon","Aroma","Şeker","Su","Buz"]},
+		"churchill":{"desc":"Limon tuz ve soda ile ferah.","ingredients":["Soda","Limon","Tuz","Buz"]},
+		"enerji-icecek":{"desc":"Gazlı ve tatlı enerji içeceği.","ingredients":["Gazlı içecek"]},
+		"mesrubatlar":{"desc":"Cola turka, Uludağ portakal, Uludağ gazoz, Ice tea","ingredients":["Çeşitli meşrubatlar"]},
+		"milkshake":{"desc":"Çilek,Çikolata, Vanilya, Oreo","ingredients":["Süt","Dondurma","Şurup"]},
+		"meyveli-soda":{"desc":"Limon, Elma, Nar, Karpuz Çilek","ingredients":["Soda","Meyve aroması"]},
+		//морожка READY
+		"icecream-vanilya":{"desc":"Klasik vanilya lezzeti.","ingredients":["Süt","Şeker","Vanilya"]},
+		"icecream-visne":{"desc":"Hafif ekşi vişne tadı.","ingredients":["Süt","Şeker","Vişne"]},
+		"icecream-cikolata":{"desc":"Zengin çikolata tadı.","ingredients":["Süt","Şeker","Kakao"]},
+		"icecream-karamel":{"desc":"Karamel dokunuşlu tatlı lezzet.","ingredients":["Süt","Şeker","Karamel"]},
+		"icecream-cilek":{"desc":"Taze çilek aroması.","ingredients":["Süt","Şeker","Çilek"]},
+		"icecream-parca-cikolata":{"desc":"Çikolata parçacıklı keyif.","ingredients":["Süt","Şeker","Çikolata parçaları"]},
+		"icecream-krokan":{"desc":"Kıtır krokan parçalarlı.","ingredients":["Süt","Şeker","Krokan"]},
+		//екстра ВРОДЕ
+		"extra-shot":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
+		"extra-syrup":{"desc":"Favori şurubunu ekle.","ingredients":["Şurup"]},
+		"extra-milk":{"desc":"Süt tercihini seç.","ingredients":["Süt"]},
+		"extra-honey":{"desc":"Doğal bal dokunuşu.","ingredients":["Bal"]},
+		"powerbank":{"desc":"30 dk şarj hizmeti.","ingredients":["Hizmet"]},
+		// BİTKİ ÇAYLARI ГОТОВО
+		"herbal-0":{"desc":"French press ile hazırlanan taze ıhlamur çayı","ingredients":["Ihlamur"]},
+		"herbal-1":{"desc":"French press ile hazırlanan taze kış çayı","ingredients":["Kış Çayı"]},
+		"herbal-2":{"desc":"French press ile hazırlanan hafif ve taze yeşil çay","ingredients":["Yeşil Çay"]},
+		"herbal-3":{"desc":"French press ile hazırlanan taze ada çayı","ingredients":["Ada Çayı"]},
+		"herbal-4":{"desc":"French press ile hazırlanan taze papatya çayı","ingredients":["Papatya"]},
+		"herbal-5":{"desc":"French press ile hazırlanan taze kuşburnu çayı","ingredients":["Kuşburnu Çayı"]},
+		 // KOKTEYLLER
+		"amour-milano":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
+		"amour-special":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
+		"amour-melo":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
+		"amour-wild-berry":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
+		"amour-vibe":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
+		"amour-sky":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
+		"amour-lime":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
+		"amour-mango-portakal":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
+		"amour-hibiscus":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
+		"amour-dark":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
+		//сладкое
+		"magnolia":{"desc":"İpeksi кремalı tatlı.","ingredients":["Süt","Krema","Meyve/kurabiye"]},
+		"profiterol":{"desc":"Çikolata soslu mini toplar.","ingredients":["Hamur topları","Krema","Çikolata"]},
+		"san-sebastian":{"desc":"Kıvamlı cheesecake dokusu.","ingredients":["Krem peynir","Yumurta","Şeker"]},
+		"brownie":{"desc":"Yoğun çikolatalı tatlı.","ingredients":["Kakao","Tereyağı","Un","Şeker"]},
+		"lotus-cup":{"desc":"Lotus bisküvili fincan tatlı.","ingredients":["Bisküvi","Krema"]},
+		"fistikli-cup":{"desc":"Fıstık aromalı fincan tatlı.","ingredients":["Fıstık","Krema","Bisküvi"]},
+		"oreo-cup":{"desc":"Oreo parçacıklı tatlı.","ingredients":["Oreo","Krema"]},
+		"lotus-cheesecake":{"desc":"Lotus tabanlı cheesecake.","ingredients":["Krem peynir","Bisküvi","Lotus"]},
+		"mini-cookies":{"desc":"Atıştırmalık mini kurabiyeler.","ingredients":["Un","Tereyağı","Şeker","Çikolata"]}
+		};
+</script>
 
 <script>
-// Enhance cards: if images lack data-id, infer from neighbor text or src filename
-(function enhanceCardIds(){
-  document.querySelectorAll('article.card img:not([data-id])').forEach(img=>{
-    // try to guess id from src
-    const src = img.getAttribute('src')||'';
-    const m = src.match(/([a-z0-9-]+)\.webp/i);
-    if (m){ img.setAttribute('data-id', m[1]); }
-    // otherwise leave as is
-  });
-})();
+    /* ----------------------------------------------
+       ✅ UI helpers
+    ---------------------------------------------- */
+    const root = document.getElementById("root");
+    let active = "hot";
+
+    // i18n mini-API
+    const fmt = n =>
+      new Intl.NumberFormat("tr-TR", {
+        style: "currency",
+        currency: "TRY",
+        maximumFractionDigits: 0
+      }).format(n);
+
+    // ✅ общий переводчик (сначала JSON, потом ENRICH, потом fallback)
+    function t(id, fallback) {
+      return window.translations?.menu?.[id]
+          || window.translations?.[id]
+          || AMOUR_ENRICH?.[id]?.name
+          || fallback;
+    }
+
+    // ---------- i18n helpers ----------
+    function getName(item) {
+      const base = typeof item.name === "object" ? { ...item.name } : { tr: item.name };
+      const fromJson = window.translations?.menu?.[item.id]?.name;
+      if (fromJson) base.en = fromJson;
+      return base[window.currentLang] || base.tr || "";
+    }
+
+    function getDesc(id) {
+      return window.translations?.menu?.[id]?.desc
+          || AMOUR_ENRICH?.[id]?.desc
+          || "";
+    }
+
+    function getIngredients(id) {
+      return window.translations?.menu?.[id]?.ingredients
+          || AMOUR_ENRICH?.[id]?.ingredients
+          || [];
+    }
+
+    // ✅ единый источник текста категорий (универсальный)
+    function catTitle(key) {
+      if (window.translations && window.translations[key]) return window.translations[key];
+
+      const tr = CATS[key]?.tr;
+      const en = CATS[key]?.en;
+
+      if (window.currentLang === "en" && en) return en;
+      return tr || en || key;
+    }
+
+    function renderCard(item) {
+      const price =
+        typeof item.price === "number"
+          ? fmt(item.price)
+          : item.price?.S
+          ? `S ${fmt(item.price.S)} / M ${fmt(item.price.M)}`
+          : "";
+
+      const name = getName(item);
+
+      const card = document.createElement("article");
+      card.className = "card overflow-hidden reveal cursor-pointer";
+      card.onclick = () => openModal(item.id);
+
+      card.innerHTML = `
+        <img class="img" src="${item.img}">
+        <div class="p-3 flex justify-between text-sm">
+          <span>${name}</span>
+          <span>${price}</span>
+        </div>
+      `;
+      return card;
+    }
+
+    function header() {
+      const h = document.createElement("div");
+      h.className = "sticky top-0 bg-black border-b border-white/10 z-30";
+      h.innerHTML = `
+        <div class="max-w-6xl mx-auto h-20 px-4 flex items-center justify-between">
+          <img src="images/logo-segafredo.png" class="h-12 opacity-80">
+          <img src="images/logo.png" class="h-16 opacity-100">
+          <img src="images/logo-alpedo.png" class="h-14 opacity-90">
+        </div>`;
+      return h;
+    }
+
+    function layout(items) {
+      const wrap = document.createElement("div");
+      wrap.className = "max-w-6xl mx-auto grid grid-cols-12 gap-4 p-4";
+
+      // ✅ Desktop aside
+      const aside = document.createElement("aside");
+      aside.className = "col-span-3 sticky top-24 hidden md:block space-y-1";
+
+      Object.keys(CATS).forEach(key => {
+        const btn = document.createElement("button");
+        btn.className = `w-full text-left px-3 py-2 rounded border ${
+          active === key ? "bg-white text-black" : "text-white hover:bg-white/10"
+        }`;
+        btn.dataset.cat = key;
+        btn.textContent = catTitle(key);
+        btn.onclick = () => { active = key; render(); };
+        aside.append(btn);
+      });
+
+      // ✅ Mobile ribbon
+      const mobile = document.createElement("div");
+      mobile.className = "flex gap-2 overflow-x-auto md:hidden px-1 sticky top-20 bg-bg py-2 z-20";
+
+      Object.keys(CATS).forEach(key => {
+        const btn = document.createElement("button");
+        btn.className = `px-3 py-2 rounded border text-xs whitespace-nowrap ${
+          active === key ? "bg-white text-black" : "text-white hover:bg-white/10"
+        }`;
+        btn.dataset.cat = key;
+        btn.textContent = catTitle(key);
+        btn.onclick = () => { active = key; render(); };
+        mobile.append(btn);
+      });
+
+      // ✅ Grid
+      const grid = document.createElement("div");
+      grid.className = "col-span-9 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4";
+      items.forEach(i => grid.append(i));
+
+      wrap.append(aside, mobile, grid);
+      return wrap;
+    }
 </script>
 
 
+
 <script>
-// === Modal + Data Enrichment ===
-const AMOUR_ENRICH = {
-//КОФЕ СДЕЛАЛ
-"espresso":{"desc":"Yoğun aromalı güçlü ve konsantre kahve","ingredients":["Espresso"],"caffeine":63},
-"espresso-macchiato":{"desc":"Az miktarda süt köpüğü ile servis edilen yoğun ve karakterli espresso","ingredients":["Espresso","Süt köpüğü"],"caffeine":63},
-"americano":{"desc":"Espresso bazlı sıcak su ile hazırlanmış yumuşak siyah kahve.","ingredients":["Espresso","Sıcak su"],"caffeine":95},
-"latte":{"desc":"Bol sütlü yumuşak içimli nazik kahve içeceği.","ingredients":["Espresso","Süt","Süt köpüğü"],"caffeine":80},
-"white-mocha":{"desc":"Beyaz çikolata ve süt ile hazırlanmış tatlı ve kremamsı kahve.","ingredients":["Espresso","Süt","Beyaz çikolata sosu"],"caffeine":90},
-"mocha":{"desc":"Çikolata ve süt ile hazırlanan, yoğun ve tatlı kahve.","ingredients":["Espresso","Süt","Çikolata sosu"],"caffeine":90},
-"caramel-latte":{"desc":"Vanilya-karamel tatlılığına sahip yumuşak ve kremamsı latte.","ingredients":["Espresso","Süt","Karamel sosu"],"caffeine":80},
-"cappuccino":{"desc":"Yoğun köpüklü süt ile hazırlanmış dengeli lezzette kahve.","ingredients":["Espresso","Süt","Süt köpüğü"],"caffeine":75},
-"cortado":{"desc":"Az sütle hazırlanan yoğun ve yumuşak içimli espresso.","ingredients":["Espresso","Az süt"],"caffeine":75},
-"flat-white":{"desc":"Kadifemsi süt dokusuyla güçlü kahve aroması.","ingredients":["Çift espresso","Süt"],"caffeine":126},
-"latte-macchiato":{"desc":"Sütün üzerine eklenen espresso dokunuşu hafif ve sütlü tat.","ingredients":["Espresso","Süt","Süt köpüğü"],"caffeine":75},
-"nutellatte":{"desc":"Nutella ile hazırlanan çikolatalı-fındıklı tatlı ve kremamsı latte.","ingredients":["Espresso","Süt","Fındık-kakao kreması"],"caffeine":80},
-"deca-cream":{"desc":"Süt bazlı, kafeinsiz kremamsı içecek.","ingredients":["Kafeinsiz espresso"],"caffeine":6},
-"turk-kahvesi":{"desc":"İnce çekilmiş kahvenin geleneksel yöntemle hazırlanmış aromatik hali.","ingredients":["Türk kahvesi","Su"],"caffeine":60},
-"double-turk":{"desc":"Çift porsiyon Türk kahvesi güçlü ve yoğun lezzet.","ingredients":["Türk kahvesi (duble)","Su"],"caffeine":120},
-"dibek":{"desc":"Havanda dövülmüş yumuşak ve kremamsı kıvamda zengin aromalı kahve.","ingredients":["Dibek kahvesi","Su"],"caffeine":60},
-"menengic":{"desc":"Doğal ve kafeinsiz fındıksı aromalı ve yumuşak dokulu içecek.","ingredients":["Menengiç","Süt veya su"]},
-//фильтркофе СДЕЛАЛ
-"kenya":{"desc":"Meyvemsi notalar ve parlak asiditeye sahip filtre kahve","ingredients":["Filtre kahve","Su"],"caffeine":120},
-"colombia":{"desc":"Yumuşak asidite karamel ve fındık notalarına sahip filtre kahve","ingredients":["Filtre kahve","Su"],"caffeine":115},
-"ethiopia":{"desc":"Narenciye ve çiçek notalarına sahip hafif ve aromatik filtre kahve","ingredients":["Filtre kahve","Su"],"caffeine":120},
-"costarica":{"desc":"Karamel ve narenciye notalarıyla dengeli ve parlak bir tat","ingredients":["Filtre kahve","Su"],"caffeine":115},
-"guatemala":{"desc":"Çikolata notaları ve hafif meyvemsi tatlılığa sahip zengin bir lezzet","ingredients":["Filtre kahve","Su"],"caffeine":115},
-"v60":{"desc":"El demleme yöntemiyle hazırlanan filtre kahve temiz ve parlak tat (V60)","ingredients":["Öğütülmüş kahve","Su"],"caffeine":120},
-"chemex":{"desc":"Chemex yöntemiyle hazırlanmış temiz ve yumuşak hafif tatlılık sunan kahve","ingredients":["Öğütülmüş kahvе","Su"],"caffeine":120},
-//кофе холодное
-"iced-americano":{"desc":"Buzlu ferah ve net kahve tadı.","ingredients":["Espresso","Su","Buz"],"caffeine":95},
-"iced-latte":{"desc":"Soğuk sütle yumuşak kahve.","ingredients":["Espresso","Süt","Buz"],"caffeine":80},
-"iced-mocha":{"desc":"Çikolatalı buzlu latte.","ingredients":["Espresso","Süt","Çikolata","Buz"],"caffeine":90},
-"iced-caramel-latte":{"desc":"Karamel dokunuşlu buzlu latte.","ingredients":["Espresso","Süt","Karamel","Buz"],"caffeine":80},
-"iced-white-mocha":{"desc":"Beyaz çikolatalı buzlu latte.","ingredients":["Espresso","Süt","Beyaz çikolata","Buz"],"caffeine":90},
-"cold-brew":{"desc":"Uzun demleme yumuşak ve güçlü.","ingredients":["Öğütülmüş kahве","Su","Buz"],"caffeine":150},
-"frappe":{"desc":"Çilek,Çikolata, Vanilya, Karamel","ingredients":["Kahve","Süt veya su","Buz"],"caffeine":80},
-"italian-frappe":{"desc":"Klasik İtalyan tarzı frappe.","ingredients":["Kahве","Süt veya su","Buz"],"caffeine":85},
-"greek-frappe":{"desc":"Yunan tarzı hafif köpüklü.","ingredients":["Çözünebilir kahве","Su","Buz"],"caffeine":75},
-"ice-nutellatte":{"desc":"Fındık-kakaolu buzlu latte.","ingredients":["Espresso","Süt","Fındık-kakao kreması","Buz"],"caffeine":80},
-"ice-chai-latte":{"desc":"Baharatlı sütlü ve ferah.","ingredients":["Çay","Süt","Baharat","Buz"]},
-"affogato":{"desc":"Dondurma üstüne sıcak espresso.","ingredients":["Espresso","Dondurma"],"caffeine":63},
-//Горячие напитки СДЕЛАЛ
-"cay":{"desc":"Geleneksel ve taze demlenmiş siyah çay.","ingredients":["Siyah çay","Su"]},
-"fincan-cay":{"desc":"Bardakta geleneksel çay","ingredients":["Siyah çay","Su"]},
-"takeaway-cay":{"desc":"Kağıt bardakta çay","ingredients":["Siyah çay","Su"]},
-"salep":{"desc":"Tarçın ve sütlü sıcak içecek","ingredients":["Salep","Süt","Tarçın","Şeker"]},
-"sicak-cikolata":{"desc":"Sıcak ve yoğun kakaolu çikolatalı içecek","ingredients":["Kakao","Süt","Şeker"]},
-"beyaz-sicak-cikolata":{"desc":"Yoğun ve sıcak beyaz çikolatalı içecek.","ingredients":["Beyaz çikolata","Süt"]},
-"chai-latte":{"desc":"Baharatlı sütlü çay içeceği","ingredients":["Çay","Süt","Chai baharatı"]},
-"balli-sut":{"desc":"Bal ile tatlandırılmış sıcak süt","ingredients":["Süt","Bal"]},
-//холодные напитки РЕДИ
-"su":{"ingredients":["Su"]},
-"soda":{"desc":"Ferahlatıcı gazlı mineral içeceği","ingredients":["Soda"]},
-"sikma-portakal":{"desc":"Taze sıkılmış doğal ve ferahlatıcı portakal suyu.","ingredients":["Portakal"]},
-"frozen":{"desc":"Mango, Çilek, Seftali, Yaban Mersini, Frambuaz, Orman Meyveli","ingredients":["Meyve püresi","Buz"]},
-"italian-soda":{"desc":"Meyveli şurup ile hazırlanan hafif gazlı ferah ve aromatik içecek.","ingredients":["Soda","Meyve şurubu","Buz"]},
-"limonata":{"desc":"Taze narenciye aromalı ev yapımı limonata.","ingredients":["Limon","Şeker","Su","Buz"]},
-"aromali-limonata":{"desc":"Çilek, Nar , Nane.","ingredients":["Limon","Aroma","Şeker","Su","Buz"]},
-"churchill":{"desc":"Limon tuz ve soda ile ferah.","ingredients":["Soda","Limon","Tuz","Buz"]},
-"enerji-icecek":{"desc":"Gazlı ve tatlı enerji içeceği.","ingredients":["Gazlı içecek"]},
-"mesrubatlar":{"desc":"Cola turka, Uludağ portakal, Uludağ gazoz, Ice tea","ingredients":["Çeşitli meşrubatlar"]},
-"milkshake":{"desc":"Çilek,Çikolata, Vanilya, Oreo","ingredients":["Süt","Dondurma","Şurup"]},
-"meyveli-soda":{"desc":"Limon, Elma, Nar, Karpuz Çilek","ingredients":["Soda","Meyve aroması"]},
-//морожка READY
-"icecream-vanilya":{"desc":"Klasik vanilya lezzeti.","ingredients":["Süt","Şeker","Vanilya"]},
-"icecream-visne":{"desc":"Hafif ekşi vişne tadı.","ingredients":["Süt","Şeker","Vişne"]},
-"icecream-cikolata":{"desc":"Zengin çikolata tadı.","ingredients":["Süt","Şeker","Kakao"]},
-"icecream-karamel":{"desc":"Karamel dokunuşlu tatlı lezzet.","ingredients":["Süt","Şeker","Karamel"]},
-"icecream-cilek":{"desc":"Taze çilek aroması.","ingredients":["Süt","Şeker","Çilek"]},
-"icecream-parca-cikolata":{"desc":"Çikolata parçacıklı keyif.","ingredients":["Süt","Şeker","Çikolata parçaları"]},
-"icecream-krokan":{"desc":"Kıtır krokan parçalarlı.","ingredients":["Süt","Şeker","Krokan"]},
-//екстра ВРОДЕ
-"extra-shot":{"desc":"Bir shot espresso ekleme.","ingredients":["Espresso"]},
-"extra-syrup":{"desc":"Favori şurubunu ekle.","ingredients":["Şurup"]},
-"extra-milk":{"desc":"Süt tercihini seç.","ingredients":["Süt"]},
-"extra-honey":{"desc":"Doğal bal dokunuşu.","ingredients":["Bal"]},
-"powerbank":{"desc":"30 dk şarj hizmeti.","ingredients":["Hizmet"]},
-// BİTKİ ÇAYLARI ГОТОВО
-"herbal-0":{"desc":"French press ile hazırlanan taze ıhlamur çayı","ingredients":["Ihlamur"]},
-"herbal-1":{"desc":"French press ile hazırlanan taze kış çayı","ingredients":["Kış Çayı"]},
-"herbal-2":{"desc":"French press ile hazırlanan hafif ve taze yeşil çay","ingredients":["Yeşil Çay"]},
-"herbal-3":{"desc":"French press ile hazırlanan taze ada çayı","ingredients":["Ada Çayı"]},
-"herbal-4":{"desc":"French press ile hazırlanan taze papatya çayı","ingredients":["Papatya"]},
-"herbal-5":{"desc":"French press ile hazırlanan taze kuşburnu çayı","ingredients":["Kuşburnu Çayı"]},
- // KOKTEYLLER
-"amour-milano":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
-"amour-special":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
-"amour-melo":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
-"amour-wild-berry":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
-"amour-vibe":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
-"amour-sky":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
-"amour-lime":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
-"amour-mango-portakal":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
-"amour-hibiscus":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
-"amour-dark":{"desc":"Daha sonra buraya yazacağım","ingredients":["Espresso"]},
-//сладкое
-"magnolia":{"desc":"İpeksi кремalı tatlı.","ingredients":["Süt","Krema","Meyve/kurabiye"]},
-"profiterol":{"desc":"Çikolata soslu mini toplar.","ingredients":["Hamur topları","Krema","Çikolata"]},
-"san-sebastian":{"desc":"Kıvamlı cheesecake dokusu.","ingredients":["Krem peynir","Yumurta","Şeker"]},
-"brownie":{"desc":"Yoğun çikolatalı tatlı.","ingredients":["Kakao","Tereyağı","Un","Şeker"]},
-"lotus-cup":{"desc":"Lotus bisküvili fincan tatlı.","ingredients":["Bisküvi","Krema"]},
-"fistikli-cup":{"desc":"Fıstık aromalı fincan tatlı.","ingredients":["Fıstık","Krema","Bisküvi"]},
-"oreo-cup":{"desc":"Oreo parçacıklı tatlı.","ingredients":["Oreo","Krema"]},
-"lotus-cheesecake":{"desc":"Lotus tabanlı cheesecake.","ingredients":["Krem peynir","Bisküvi","Lotus"]},
-"mini-cookies":{"desc":"Atıştırmalık mini kurabiyeler.","ingredients":["Un","Tereyağı","Şeker","Çikolata"]}
-};
-function enrichItem(item) {
-  const enrich = AMOUR_ENRICH[item.id] || {};
+    function initReveal(){
+      document.querySelectorAll('.reveal').forEach(el=>{
+        setTimeout(()=>el.classList.add('in'),50);
+      });
+    }
 
-  return {
-    ...item,
-    desc: enrich.desc || item.desc || "",
-    ingredients: enrich.ingredients || item.ingredients || [],
-    caffeine: 
-      typeof enrich.caffeine === "number"
-      ? enrich.caffeine
-      : item.caffeine ?? null
-  };
+    const modalEl = document.getElementById("drinkModal");
+
+    function openModal(id) {
+      const item = MENU.find(x => x.id === id);
+      if (!item) return;
+
+      const name        = getName(item);
+      const desc        = getDesc(item.id);
+      const ingredients = getIngredients(item.id);
+      const caffeine    = AMOUR_ENRICH[item.id]?.caffeine || item.caffeine || null;
+
+      document.getElementById("modalImg").src = item.img;
+      document.getElementById("modalName").textContent = name;
+
+      // ✅ UI labels из JSON
+      const descLabel     = window.translations?.description  || t("desc","Description");
+      const ingLabel      = window.translations?.ingredients  || t("ingredients","Ingredients");
+      const caffeineLabel = window.translations?.caffeine     || t("caffeine","Caffeine"); // ✅ добавили
+
+      // ✅ ставим переводы заголовков
+      document.getElementById("modalIngTitle").textContent = ingLabel;
+      document.getElementById("modalDescUI").previousElementSibling.textContent = descLabel;
+
+      const descUI = document.getElementById("modalDescUI");
+      descUI.innerHTML = desc
+        ? `<span class="px-2 py-1 bg-white/10 rounded">${desc}</span>`
+        : "";
+
+      const ingUI = document.getElementById("modalIng");
+      ingUI.innerHTML = ingredients.length
+        ? ingredients.map(i => `<li>${i}</li>`).join("")
+        : `<li>-</li>`;
+
+      const title = document.getElementById("cafTitle");
+      const dots  = document.getElementById("cafDots");
+      const mg    = document.getElementById("cafMg");
+
+      if (caffeine) {
+        title.textContent = caffeineLabel; // ✅ теперь есть
+        title.classList.remove("hidden");
+        dots.classList.remove("hidden");
+        mg.classList.remove("hidden");
+
+        const level = Math.min(Math.floor(caffeine / 40), 5);
+        dots.innerHTML = Array.from({ length: 5 })
+          .map((_, i) =>
+            `<div class="w-2 h-2 rounded-full ${i < level ? 'bg-green-400' : 'bg-white/30'}"></div>`
+          ).join("");
+
+        mg.textContent = `${caffeine} mg`;
+      } else {
+        title.classList.add("hidden");
+        dots.classList.add("hidden");
+        mg.classList.add("hidden");
+      }
+
+      modalEl.classList.remove("hidden");
+    }
+
+    document.getElementById("modalClose").onclick = () =>
+      modalEl.classList.add("hidden");
+
+    modalEl.onclick = e => {
+      if (e.target === e.currentTarget) modalEl.classList.add("hidden");
+    };
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") modalEl.classList.add("hidden");
+    });
+</script>
+
+
+
+
+<script>
+/* ----------------------------------------------
+   ✅ Render start
+---------------------------------------------- */
+async function render(){
+ root.innerHTML="";
+ const items = MENU.filter(m=>m.cat===active).map(renderCard);
+ root.append(header(),layout(items));
+ initReveal();
 }
 
-// Find MENU array reference from page (assumes it's defined globally)
-function amourFindMenu(){
-  try {
-    return window.MENU || MENU;
-  } catch(e){ return []; }
-}
+// Стартуем сайт: сначала показываем выбор языка
+langModal.classList.remove("hidden");
 
 </script>
 
