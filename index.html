@@ -637,31 +637,37 @@ const AMOUR_ENRICH = {
 	  const wrap = document.createElement("div");
 	  wrap.className = "max-w-6xl mx-auto grid grid-cols-12 gap-2 p-2";
 
-	  // ✅ Левое меню (всегда показываем)
+	  // ✅ Левое меню (всегда)
 	  const aside = document.createElement("aside");
-	  aside.className = "col-span-4 sm:col-span-3 sticky top-20 space-y-1";
+	  aside.className = `
+		col-span-4 sm:col-span-3 
+		sticky top-20 
+		space-y-1
+	  `;
 
 	  Object.keys(CATS).forEach(key => {
 		const btn = document.createElement("button");
-		btn.className = `w-full text-left px-2 py-2 rounded border text-xs sm:text-sm ${
-		  active === key ? "bg-white text-black font-semibold" : "text-white hover:bg-white/10"
-		}`;
+		btn.className = `
+		  w-full text-left px-2 py-2 rounded border text-xs sm:text-sm
+		  ${active === key ? "bg-white text-black font-semibold" : "text-white hover:bg-white/10"}
+		`;
 		btn.dataset.cat = key;
 		btn.textContent = catTitle(key);
 		btn.onclick = () => { active = key; render(); };
 		aside.append(btn);
 	  });
 
-	  // 🚫 Убираем mobile ribbon (оставляем скрытым)
+	  // 🚫 Скрываем мобильную ленту
 	  const mobile = document.createElement("div");
 	  mobile.className = "hidden";
 
-	  // ✅ Товары (на телефоне — 1 колонка, на ПК — как раньше)
+	  // ✅ Товары
 	  const grid = document.createElement("div");
 	  grid.className = `
 		col-span-8 sm:col-span-9 
-		grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 
-		gap-3 sm:gap-4
+		grid 
+		grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 
+		gap-2 sm:gap-4
 	  `;
 	  items.forEach(i => grid.append(i));
 
