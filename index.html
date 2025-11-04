@@ -648,9 +648,10 @@ const AMOUR_ENRICH = {
 	  Object.keys(CATS).forEach(key => {
 		const btn = document.createElement("button");
 		btn.className = `
-		  w-full text-left px-2 py-2 rounded border text-xs sm:text-sm
+		  w-full text-left px-2 py-2 rounded text-xs sm:text-sm
 		  ${active === key ? "bg-white text-black font-semibold" : "text-white hover:bg-white/10"}
 		`;
+
 		btn.dataset.cat = key;
 		btn.textContent = catTitle(key);
 		btn.onclick = () => { active = key; render(); };
