@@ -24,7 +24,7 @@
 //test
     </script>
     <style>
-      body { background:#0b0b0b; color:#fff; }
+	body { background:#0b0b0b; color:#fff; }	
       .card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; }
       .img {
         aspect-ratio: 4/3;
@@ -112,6 +112,15 @@
         body.rtl button {
           text-align: right;
         }
+		.bg-amour {
+		  background: url('images/amour-bg.png') center/cover no-repeat;
+		  filter: brightness(1) contrast(1) saturate(1);
+		}
+
+		#lang-modal {
+		  backdrop-filter: blur(12px);
+		  background: rgba(0,0,0,0.25);
+		}
 
     </style>
   </head>
@@ -130,7 +139,8 @@
     </footer>
 
 <!-- язык -->
-<div id="lang-modal" class="fixed inset-0 bg-black/90 flex flex-col items-center justify-center text-white z-50 text-center px-4 hidden">
+<div id="lang-modal" class="fixed inset-0 flex flex-col items-center justify-center text-white z-50 text-center px-4 hidden">
+  <div class="absolute inset-0 -z-10 bg-amour"></div>
   <div class="max-w-md w-full">
     <h2 class="text-2xl font-semibold mb-8 tracking-wide uppercase text-gray-100">
       🌐 Select Your Language
