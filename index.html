@@ -157,7 +157,23 @@
 <!-- кнопки выбора языка -->
 <style>
   .lang-btn {
-    @apply px-6 py-3 bg-white text-black font-medium rounded-lg shadow-sm transition-transform duration-200 hover:scale-105 hover:bg-gray-200 active:scale-95;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: #fff;
+    color: #000;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .lang-btn:hover {
+    transform: scale(1.05);
+    background: #e5e7eb;
+  }
+
+  .lang-btn:active {
+    transform: scale(0.95);
   }
 </style>
 <script>
@@ -327,7 +343,7 @@ const MENU = [
         { id:"icecream-krokan", cat:"icecream", name:"Krokan Dondurma", price:60, img:"images/icecream-krokan.webp" },
 
         // KAHVELER (добавлены описания/состав/кф)
-        { id:"espresso", cat:"coffees", name:"Espresso", price:{S:140, M:160}, img:"images/espresso.webp",
+        { id:"espresso", cat:"coffees", name:"Espresso", sizes:{S:140, M:160}, img:"images/espresso.webp",
           desc:"Yoğun, kısa ve güçlü kahve.",
           ingredients:["Espresso"],
           caffeine:63
@@ -604,9 +620,23 @@ const AMOUR_ENRICH = {
           || [];
     }
 
+    function formatPrice(item) {
+      if (typeof item.price === "number") return fmt(item.price);
+
+      const sizes = item.sizes || item.price;
+      if (sizes?.S && sizes?.M) return `S ${fmt(sizes.S)} / M ${fmt(sizes.M)}`;
+      if (typeof sizes?.S === "number") return `S ${fmt(sizes.S)}`;
+      if (typeof sizes?.M === "number") return `M ${fmt(sizes.M)}`;
+
+      return "";
+    }
+
     //  единый источник текста категорий (универсальный)
     function catTitle(key) {
       if (window.translations && window.translations[key]) return window.translations[key];
+
+      const base = CATS[key];
+      if (typeof base === "string") return base;
 
       const tr = CATS[key]?.tr;
       const en = CATS[key]?.en;
@@ -616,12 +646,7 @@ const AMOUR_ENRICH = {
     }
 
     function renderCard(item) {
-      const price =
-        typeof item.price === "number"
-          ? fmt(item.price)
-          : item.price?.S
-          ? `S ${fmt(item.price.S)} / M ${fmt(item.price.M)}`
-          : "";
+      const price = formatPrice(item);
 
       const name = getName(item);
 
